@@ -1,4 +1,5 @@
-﻿using Abp.Domain.Repositories;
+﻿using Abp.Application.Services.Dto;
+using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using ELS.Vocabularies.Dtos;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace ELS.Vocabularies
             _vocabularyRepository = vocabularyRepository;
         }
 
-        public async Task<VocabularyListResultDto> GetAllAsync(GetAllVocabulariesInput input)
+        public async Task<PagedResultDto<VocabularyListDto>> GetAllAsync(PagedVocabularyResultRequestDto input)
         {
             var query = _vocabularyRepository
                 .GetAll()
@@ -26,11 +27,12 @@ namespace ELS.Vocabularies
                 .WhereIf(input.Level.HasValue, t => t.Level == input.Level)
                 .OrderByDescending(t => t.CreationTime);
 
-            var totalItems = await query.CountAsync();
-            var vocabularies = await query.Skip(input.PageSize * (input.PageNumber - 1)).Take(input.PageSize).ToListAsync();          
+            var totalCount = await query.CountAsync();
+            var vocabularies = await query.Skip(input.SkipCount).Take(input.MaxResultCount).ToListAsync();
 
-            return new VocabularyListResultDto(
-                ObjectMapper.Map<List<VocabularyListDto>>(vocabularies), totalItems, input.PageSize
+            return new PagedResultDto<VocabularyListDto>(
+                totalCount,
+                ObjectMapper.Map<List<VocabularyListDto>>(vocabularies)
             );
         }
     }

@@ -14,6 +14,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import * as moment from 'moment';
+import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
@@ -953,6 +954,7 @@ export class TenantServiceProxy {
         }));
     }
 
+
     protected processGetAll(response: HttpResponseBase): Observable<TenantDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
@@ -1827,6 +1829,86 @@ export class UserServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = UserDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class VocabularyServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    
+    getAll(
+        term: string | undefined,
+        classification: WordClassEnum | undefined,
+        level: VocabularyLevelEnum | undefined,
+        skipCount: number | undefined,
+        maxResultCount: number | undefined): Observable<VocabularyDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetAll?";
+        if (term !== undefined)
+            url_ += "Term=" + encodeURIComponent("" + term) + "&";
+        if (classification !== undefined)
+            url_ += "Classification=" + encodeURIComponent("" + classification) + "&";
+        if (level !== undefined)
+            url_ += "Level=" + encodeURIComponent("" + level) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VocabularyDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VocabularyDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<VocabularyDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularyDtoPagedResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3650,7 +3732,7 @@ export class UserDto implements IUserDto {
     }
 }
 
-export interface IUserDto {
+export interface  IUserDto {
     id: number;
     userName: string;
     name: string;
@@ -3769,6 +3851,133 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
     }
 }
 
+export class VocabularyListDto implements IVocabularyListDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    creationTime: moment.Moment;
+
+    constructor(data?: IVocabularyListDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.term = _data["term"];
+            this.definition = _data["definition"];
+            this.classification = _data["classification"];
+            this.phonetics = _data["phonetics"];
+            this.level = _data["level"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): VocabularyListDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VocabularyListDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["term"] = this.term;
+        data["definition"] = this.definition;
+        data["classification"] = this.classification;
+        data["phonetics"] = this.phonetics;
+        data["level"] = this.level;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        return data;
+    }
+
+    clone(): VocabularyListDto {
+        const json = this.toJSON();
+        let result = new VocabularyListDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IVocabularyListDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    creationTime: moment.Moment;
+}
+
+export class VocabularyDtoPagedResultDto implements IVocabularyDtoPagedResultDto {
+    items: VocabularyListDto[] | undefined;
+    totalCount: number;
+
+    constructor(data?: IVocabularyDtoPagedResultDto) {
+        if (data) {
+        for (var property in data) {
+            if (data.hasOwnProperty(property))
+            (<any>this)[property] = (<any>data)[property];
+        }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+        if (Array.isArray(_data["items"])) {
+            this.items = [] as any;
+            for (let item of _data["items"])
+            this.items.push(VocabularyListDto.fromJS(item));
+        }
+        this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): VocabularyDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VocabularyDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+        data["items"] = [];
+        for (let item of this.items)
+            data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): VocabularyDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new VocabularyDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IVocabularyDtoPagedResultDto {
+    items: VocabularyListDto[] | undefined;
+    totalCount: number;
+}
+
+export interface ItemOptionDto<T> {
+    name: string,
+    value: T
+}
+
 export interface IUserLoginInfoDto {
     id: number;
     name: string | undefined;
@@ -3800,6 +4009,8 @@ export class ApiException extends Error {
         return obj.isApiException === true;
     }
 }
+
+
 
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): Observable<any> {
     if (result !== null && result !== undefined)

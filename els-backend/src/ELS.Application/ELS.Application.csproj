@@ -17,4 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ELS.Core\ELS.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Vocabularies\Validators\" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
+import { VocabularyLevelEnum, WordClassEnum } from "./AppEnums";
+
 export class AppConsts {
 
     static remoteServiceBaseUrl: string;
@@ -18,3 +20,27 @@ export class AppConsts {
         encryptedAuthTokenName: 'enc_auth_token'
     };
 }
+
+// optional: Record type annotation guaranties that 
+// all the values from the enum are presented in the mapping
+export const WordClass2LabelMapping: Record<WordClassEnum, string> = {
+    [WordClassEnum.Noun]: "Noun",
+    [WordClassEnum.Verb]: "Verb",
+    [WordClassEnum.Adjective]: "Adjective",
+    [WordClassEnum.Adverb]: "Adverb",
+    [WordClassEnum.PhrasalVerb]: "Phrasal Verb",
+    [WordClassEnum.Preposition]: "Preposition",
+    [WordClassEnum.Conjunction]: "Conjunction",
+    [WordClassEnum.Pronouns]: "Pronouns",
+    [WordClassEnum.Exclamation]: "Exclamation",
+    [WordClassEnum.Idiom]: "Idiom",
+    [WordClassEnum.Other]: "Other"
+};
+
+// optional: Record type annotation guaranties that 
+// all the values from the enum are presented in the mapping
+export const VocabularyLevel2LabelMapping: Record<VocabularyLevelEnum, string> = {
+    [VocabularyLevelEnum.Easy]: "Easy",
+    [VocabularyLevelEnum.Medium]: "Medium",
+    [VocabularyLevelEnum.Hard]: "Hard"
+};

@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ELS.Vocabularies
 {
     [Table("AppVocabularies")]
-    public class Vocabulary : Entity, IHasCreationTime
+    public class Vocabulary : Entity, IHasCreationTime, ISoftDelete, IMustHaveTenant
     {
         public const int MaxTermLength = 512;
         public const int MaxDefinitionLength = 512;
@@ -31,14 +31,15 @@ namespace ELS.Vocabularies
 
         public string Example { get; set; }
 
-        public bool Status { get; set; }
-
         public DateTime CreationTime { get; set; }
+
+        public int TenantId { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         public Vocabulary()
         {
             CreationTime = Clock.Now;
-            Status = true;
         }
 
         public Vocabulary(string term, string definition, WordClassType classification, VocabularyLevelType level, string phonetics = null, string description = null, string example = null)
