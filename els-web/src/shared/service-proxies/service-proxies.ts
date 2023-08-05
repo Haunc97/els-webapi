@@ -1851,6 +1851,113 @@ export class VocabularyServiceProxy {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateVocabularyDto | undefined): Observable<VocabularyDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VocabularyDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VocabularyDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<VocabularyDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularyDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
     
     getAll(
         term: string | undefined,
@@ -1909,6 +2016,118 @@ export class VocabularyServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = VocabularyDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: number | undefined): Observable<VocabularyDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VocabularyDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VocabularyDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<VocabularyDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularyDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: VocabularyDto | undefined): Observable<VocabularyDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VocabularyDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VocabularyDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<VocabularyDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularyDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3851,6 +4070,81 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
     }
 }
 
+export class VocabularyDto implements IVocabularyDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    description: string;
+    example: string;
+    creationTime: moment.Moment;
+
+    constructor(data?: IVocabularyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.term = _data["term"];
+            this.definition = _data["definition"];
+            this.classification = _data["classification"];
+            this.phonetics = _data["phonetics"];
+            this.level = _data["level"];
+            this.description = _data["description"];
+            this.example = _data["example"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): VocabularyDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VocabularyDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["term"] = this.term;
+        data["definition"] = this.definition;
+        data["classification"] = this.classification;
+        data["phonetics"] = this.phonetics;
+        data["level"] = this.level;
+        data["description"] = this.description;
+        data["example"] = this.example;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        return data;
+    }
+
+    clone(): VocabularyDto {
+        const json = this.toJSON();
+        let result = new VocabularyDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IVocabularyDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    description: string;
+    example: string;
+    creationTime: moment.Moment;
+}
+
 export class VocabularyListDto implements IVocabularyListDto {
     id: number;
     term: string;
@@ -3971,6 +4265,73 @@ export class VocabularyDtoPagedResultDto implements IVocabularyDtoPagedResultDto
 export interface IVocabularyDtoPagedResultDto {
     items: VocabularyListDto[] | undefined;
     totalCount: number;
+}
+
+export class CreateVocabularyDto implements ICreateVocabularyDto {
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    description: string;
+    example: string;
+
+    constructor(data?: ICreateVocabularyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.term = _data["term"];
+            this.definition = _data["definition"];
+            this.classification = _data["classification"];
+            this.phonetics = _data["phonetics"];
+            this.level = _data["level"];
+            this.description = _data["description"];
+            this.example = _data["example"];
+        }
+    }
+
+    static fromJS(data: any): CreateUserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateUserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["term"] = this.term;
+        data["definition"] = this.definition;
+        data["classification"] = this.classification;
+        data["phonetics"] = this.phonetics;
+        data["level"] = this.level;
+        data["description"] = this.description;
+        data["example"] = this.example;
+        return data;
+    }
+
+    clone(): CreateVocabularyDto {
+        const json = this.toJSON();
+        let result = new CreateVocabularyDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateVocabularyDto {
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    phonetics: string;
+    level: VocabularyLevelEnum;
+    description: string;
+    example: string;
 }
 
 export interface ItemOptionDto<T> {

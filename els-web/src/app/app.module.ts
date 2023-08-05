@@ -39,6 +39,8 @@ import { SidebarLogoComponent } from './layout/sidebar-logo.component';
 import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
 import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 import { VocabulariesComponent } from './vocabularies/vocabularies.component';
+import { CreateVocabularyDialogComponent } from './vocabularies/create-vocabulary-dialog/create-vocabulary-dialog.component';
+import { EditVocabularyDialogComponent } from './vocabularies/edit-vocabulary-dialog/edit-vocabulary-dialog.component';
 
 @NgModule({
     declarations: [
@@ -69,7 +71,9 @@ import { VocabulariesComponent } from './vocabularies/vocabularies.component';
         SidebarLogoComponent,
         SidebarUserPanelComponent,
         SidebarMenuComponent,
-        VocabulariesComponent
+        VocabulariesComponent,
+        CreateVocabularyDialogComponent,
+        EditVocabularyDialogComponent
     ],
     imports: [
         CommonModule,

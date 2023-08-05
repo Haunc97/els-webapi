@@ -4,8 +4,10 @@ import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { VocabularyDtoPagedResultDto, VocabularyListDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
-import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
+import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/create-vocabulary-dialog.component';
+import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-vocabulary-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: WordClassEnum | null
@@ -14,7 +16,6 @@ class PagedVocabulariesRequestDto extends PagedRequestDto {
 @Component({
   selector: 'app-vocabularies',
   templateUrl: './vocabularies.component.html',
-  styleUrls: ['./vocabularies.component.css'],
   animations: [appModuleAnimation()]
 })
 export class VocabulariesComponent extends PagedListingComponentBase<VocabularyListDto> {
@@ -43,6 +44,10 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
     private _modalService: BsModalService
   ) {
     super(injector);
+  }
+
+  createVocabulary(): void {
+    this.showCreateOrEditUserDialog();
   }
 
   clearFilters(): void {
@@ -81,9 +86,47 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
   }
 
   editVocabulary(vocabulary: VocabularyListDto): void {
+    this.showCreateOrEditUserDialog(vocabulary.id);
   }
 
-  protected delete(entity: VocabularyListDto): void {
-    throw new Error('Method not implemented.');
+  protected delete(vocabulary: VocabularyListDto): void {
+    abp.message.confirm(
+      this.l('VocabularyDeleteWarningMessage', vocabulary.term),
+      undefined,
+      (result: boolean) => {
+        if (result) {
+          this._vocabularyService.delete(vocabulary.id).subscribe(() => {
+            abp.notify.success(this.l('SuccessfullyDeleted'));
+            this.refresh();
+          });
+        }
+      }
+    );
+  }
+
+  private showCreateOrEditUserDialog(id?: number): void {
+    let createOrEditVocabularyDialog: BsModalRef;
+    if (!id) {
+      createOrEditVocabularyDialog = this._modalService.show(
+        CreateVocabularyDialogComponent,
+        {
+          class: 'modal-lg',
+        }
+      );
+    } else {
+      createOrEditVocabularyDialog = this._modalService.show(
+        EditVocabularyDialogComponent,
+        {
+          class: 'modal-lg',
+          initialState: {
+            id: id,
+          },
+        }
+      );
+    }
+
+    createOrEditVocabularyDialog.content.onSave.subscribe(() => {
+      this.refresh();
+    });
   }
 }

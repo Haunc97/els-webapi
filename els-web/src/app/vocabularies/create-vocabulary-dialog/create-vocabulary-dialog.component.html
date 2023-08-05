@@ -1,0 +1,149 @@
+<form
+    class="form-horizontal"
+    autocomplete="off"
+    #createVocabularyModal="ngForm"
+    (ngSubmit)="save()"
+>
+<abp-modal-header
+    [title]="'CreateNewVocabulary' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+></abp-modal-header>
+    <div class="modal-body">
+        <tabset>
+            <tab [heading]="'General' | localize" class="pt-3 px-2">
+                <div class="form-group row required">
+                <label class="col-md-3 col-form-label" for="name">
+                    {{ "Term" | localize }}
+                </label>
+                <div class="col-md-9">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="term"
+                        id="term"
+                        required
+                        maxlength="32"
+                        [(ngModel)]="vocabulary.term"
+                        #termModel="ngModel"
+                        #termEl
+                    />
+                    <abp-validation-summary
+                        [control]="termModel"
+                        [controlEl]="termEl"
+                    ></abp-validation-summary>
+                </div>
+                </div>
+                <div class="form-group row required">
+                <label class="col-md-3 col-form-label" for="surname">
+                    {{ "Definition" | localize }}
+                </label>
+                <div class="col-md-9">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="def"
+                        id="def"
+                        required
+                        maxlength="32"
+                        [(ngModel)]="vocabulary.definition"
+                        #defModel="ngModel"
+                        #defEl
+                    />
+                    <abp-validation-summary
+                        [control]="defModel"
+                        [controlEl]="defEl"
+                    ></abp-validation-summary>
+                </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="surname">
+                    {{ "Phonetics" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="phonetics"
+                        id="phonetics"
+                        maxlength="32"
+                        [(ngModel)]="vocabulary.phonetics"
+                        #phoneticsModel="ngModel"
+                        #phoneticsEl
+                    />
+                    <abp-validation-summary
+                        [control]="phoneticsModel"
+                        [controlEl]="phoneticsEl"
+                    ></abp-validation-summary>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="surname">
+                    {{ "Description" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                    <textarea
+                        rows="4"
+                        class="form-control"
+                        name="desc"
+                        id="desc"
+                        maxlength="512"
+                        [(ngModel)]="vocabulary.description"
+                        #descModel="ngModel"
+                        #descEl
+                    ></textarea>
+                    <abp-validation-summary
+                        [control]="descModel"
+                        [controlEl]="descEl"
+                    ></abp-validation-summary>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="surname">
+                    {{ "Example" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                    <textarea
+                        rows="4"
+                        class="form-control"
+                        name="ex"
+                        id="ex"
+                        maxlength="512"
+                        [(ngModel)]="vocabulary.example"
+                        #exModel="ngModel"
+                        #exEl
+                    ></textarea>
+                    <abp-validation-summary
+                        [control]="exModel"
+                        [controlEl]="exEl"
+                    ></abp-validation-summary>
+                    </div>
+                </div>
+            </tab>
+            <tab [heading]="'StudySets' | localize" class="pt-3 px-2">
+                <div class="form-group row mb-0">
+                <!-- <ng-container *ngFor="let role of roles; let i = index">
+                    <div class="col-md-6">
+                    <div class="custom-control custom-checkbox">
+                        <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        [id]="'role_' + i"
+                        [checked]="isRoleChecked(role.normalizedName)"
+                        (change)="onRoleChange(role, $event)"
+                        />
+                        <label class="custom-control-label" [for]="'role_' + i">
+                        {{ role.name }}
+                        </label>
+                    </div>
+                    </div>
+                </ng-container> -->
+                </div>
+            </tab>
+        </tabset>
+    </div>
+    <abp-modal-footer
+        [cancelDisabled]="saving"
+        [saveDisabled]="!createVocabularyModal.form.valid || saving"
+        (onCancelClick)="bsModalRef.hide()"
+    ></abp-modal-footer>
+</form>
