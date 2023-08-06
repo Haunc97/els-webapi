@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ServiceProxyModule } from '@shared/service-proxies/service-proxy.module';
 import { SharedModule } from '@shared/shared.module';
+import { CarouselModule } from 'ngx-bootstrap/carousel';
 import { HomeComponent } from '@app/home/home.component';
 import { AboutComponent } from '@app/about/about.component';
 // tenants
@@ -41,6 +42,8 @@ import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 import { VocabulariesComponent } from './vocabularies/vocabularies.component';
 import { CreateVocabularyDialogComponent } from './vocabularies/create-vocabulary-dialog/create-vocabulary-dialog.component';
 import { EditVocabularyDialogComponent } from './vocabularies/edit-vocabulary-dialog/edit-vocabulary-dialog.component';
+import { ViewVocabularyDialogComponent } from './vocabularies/view-vocabulary-dialog/view-vocabulary-dialog.component';
+import { FlashcardsComponent } from './activities/flashcards/flashcards.component';
 
 @NgModule({
     declarations: [
@@ -73,7 +76,9 @@ import { EditVocabularyDialogComponent } from './vocabularies/edit-vocabulary-di
         SidebarMenuComponent,
         VocabulariesComponent,
         CreateVocabularyDialogComponent,
-        EditVocabularyDialogComponent
+        EditVocabularyDialogComponent,
+        ViewVocabularyDialogComponent,
+        FlashcardsComponent
     ],
     imports: [
         CommonModule,
@@ -89,6 +94,7 @@ import { EditVocabularyDialogComponent } from './vocabularies/edit-vocabulary-di
         ServiceProxyModule,
         SharedModule,
         NgxPaginationModule,
+        CarouselModule
     ],
     providers: []
 })

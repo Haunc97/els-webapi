@@ -120,6 +120,7 @@
 		<text name="Vocabularies">Vocabularies</text>
 		<text name="CreateNewVocabulary" value="Create new vocabulary" />
 		<text name="EditVocabulary" value="Edit vocabulary" />
+		<text name="ViewVocabulary" value="View vocabulary" />
 		
 	</texts>
 </localizationDictionary>

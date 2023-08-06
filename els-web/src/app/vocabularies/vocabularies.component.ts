@@ -8,6 +8,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
 import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/create-vocabulary-dialog.component';
 import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-vocabulary-dialog.component';
+import { ViewVocabularyDialogComponent } from './view-vocabulary-dialog/view-vocabulary-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: WordClassEnum | null
@@ -87,6 +88,18 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
 
   editVocabulary(vocabulary: VocabularyListDto): void {
     this.showCreateOrEditUserDialog(vocabulary.id);
+  }
+
+  viewVocabulary(vocabulary: VocabularyListDto): void {
+    this._modalService.show(
+      ViewVocabularyDialogComponent,
+      {
+        class: 'modal-lg',
+        initialState: {
+          id: vocabulary.id,
+        },
+      }
+    );
   }
 
   protected delete(vocabulary: VocabularyListDto): void {

@@ -23,6 +23,7 @@ namespace ELS.Vocabularies
             _vocabularyRepository = vocabularyRepository;
         }
 
+        #region Commands
         public async Task<VocabularyDto> CreateAsync(CreateVocabularyDto input)
         {
             //CheckCreatePermission();
@@ -56,7 +57,9 @@ namespace ELS.Vocabularies
 
             await _vocabularyRepository.DeleteAsync(input.Id);
         }
+        #endregion
 
+        #region Queries
         public async Task<VocabularyDto> GetAsync(EntityDto<int> input)
         {
             //CheckGetPermission();
@@ -82,6 +85,17 @@ namespace ELS.Vocabularies
                 ObjectMapper.Map<List<VocabularyListDto>>(vocabularies)
             );
         }
+
+        public async Task<ListResultDto<VocabularyDto>> GetRandomAsync(LimitedResultRequestDto input)
+        {
+            var vocabularies = await _vocabularyRepository
+               .GetAll()
+               .OrderBy(r => Guid.NewGuid()).Take(input.MaxResultCount)
+               .ToListAsync();
+
+            return new ListResultDto<VocabularyDto>(ObjectMapper.Map<List<VocabularyDto>>(vocabularies));
+        }
+        #endregion
 
         protected void CheckPermission(string permissionName)
         {

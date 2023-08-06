@@ -1,5 +1,4 @@
 ﻿using Abp.Application.Services.Dto;
-using ELS.Users.Dto;
 using ELS.Vocabularies.Dtos;
 using System.Threading.Tasks;
 
@@ -9,6 +8,8 @@ namespace ELS.Vocabularies
     {
         #region Queries
         Task<PagedResultDto<VocabularyListDto>> GetAllAsync(PagedVocabularyResultRequestDto input);
+
+        Task<ListResultDto<VocabularyDto>> GetRandomAsync(LimitedResultRequestDto input);
 
         Task<VocabularyDto> GetAsync(EntityDto<int> input);
         #endregion
