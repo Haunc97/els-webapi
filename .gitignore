@@ -4,9 +4,9 @@
 .vs/
 obj/
 bin/
-aspnet-core/src/ELS.Web.Host/App_Data/Logs/
-aspnet-core/src/ELS.Web.Mvc/App_Data/Logs/
-aspnet-core/src/ELS.Migrator/Logs/Logs.txt
-aspnet-core/build/outputs/
-aspnet-core/docker/mvc/Mvc-Logs/
+els-backend/src/ELS.Web.Host/App_Data/Logs/
+els-backend/src/ELS.Web.Mvc/App_Data/Logs/
+els-backend/src/ELS.Migrator/Logs/Logs.txt
+els-backend/build/outputs/
+els-backend/docker/mvc/Mvc-Logs/
 
