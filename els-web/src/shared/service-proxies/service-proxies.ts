@@ -14,7 +14,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import * as moment from 'moment';
-import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
@@ -1961,17 +1961,17 @@ export class VocabularyServiceProxy {
     
     getAll(
         term: string | undefined,
-        classification: WordClassEnum | undefined,
-        level: VocabularyLevelEnum | undefined,
+        classification: FilterProperty<WordClassEnum> | undefined,
+        level: FilterProperty<VocabularyLevelEnum> | undefined,
         skipCount: number | undefined,
         maxResultCount: number | undefined): Observable<VocabularyDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetAll?";
         if (term !== undefined)
             url_ += "Term=" + encodeURIComponent("" + term) + "&";
-        if (classification !== undefined)
-            url_ += "Classification=" + encodeURIComponent("" + classification) + "&";
-        if (level !== undefined)
-            url_ += "Level=" + encodeURIComponent("" + level) + "&";
+        if (classification?.term != undefined)
+            url_ += "Classification.Term=" + encodeURIComponent("" + (classification.term !== undefined ? classification.term : "")) + "&" + "Classification.Method=" + encodeURIComponent('' + classification.method) + "&";
+        if (level?.term != undefined)
+            url_ += "Level.Term=" + encodeURIComponent("" + (level.term !== undefined ? level.term : "")) + "&" + "Level.Method=" + encodeURIComponent('' + level.method) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -4436,6 +4436,53 @@ export interface ICreateVocabularyDto {
     level: VocabularyLevelEnum;
     description: string;
     example: string;
+}
+
+export class FilterProperty<T> implements IFilterProperty<T>
+{
+    term: T | undefined;
+    method: FilterMethodEnum;
+
+    constructor(data?: IFilterProperty<T>) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.term = _data["term"];
+            this.method = _data["method"];
+        }
+    }
+
+    static toFilterProperty<T>(term: T, method) {
+        let result = new FilterProperty<T>();
+        result.init({term, method});
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["term"] = this.term;
+        data["method"] = this.method;
+        return data;
+    }
+
+    clone(): FilterProperty<T> {
+        const json = this.toJSON();
+        let result = new FilterProperty<T>();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFilterProperty<T> {
+    term: T | undefined,
+    method: FilterMethodEnum
 }
 
 export interface IListResultDto<T> {

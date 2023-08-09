@@ -1,14 +1,15 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
-using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using ELS.Authorization;
+using ELS.Utils;
 using ELS.Vocabularies.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ELS.Vocabularies
@@ -43,8 +44,7 @@ namespace ELS.Vocabularies
 
             var vocabulary = await GetVocabularyByIdAsync(input.Id);
 
-            try { ObjectMapper.Map(input, vocabulary); }
-            catch (Exception e) { };
+            ObjectMapper.Map(input, vocabulary);
 
             await _vocabularyRepository.UpdateAsync(vocabulary);
 
@@ -60,21 +60,13 @@ namespace ELS.Vocabularies
         #endregion
 
         #region Queries
-        public async Task<VocabularyDto> GetAsync(EntityDto<int> input)
-        {
-            //CheckGetPermission();
-
-            var entity = await GetVocabularyByIdAsync(input.Id);
-            return ObjectMapper.Map<VocabularyDto>(entity);
-        }
-
         public async Task<PagedResultDto<VocabularyListDto>> GetAllAsync(PagedVocabularyResultRequestDto input)
         {
             var query = _vocabularyRepository
                 .GetAll()
                 .WhereIf(!string.IsNullOrEmpty(input.Term), v => v.Term.ToLower().IndexOf(input.Term.ToLower()) >= 0)
-                .WhereIf(input.Classification.HasValue, v => v.Classification == input.Classification)
-                .WhereIf(input.Level.HasValue, v => v.Level == input.Level)
+                .WhereIf(input.Classification != null, FilterExpression.GetExpression<Vocabulary, WordClassType>(input.Classification, nameof(Vocabulary.Classification)))
+                .WhereIf(input.Level != null, FilterExpression.GetExpression<Vocabulary, VocabularyLevelType>(input.Level, nameof(Vocabulary.Level)))
                 .OrderByDescending(v => v.CreationTime);
 
             var totalCount = await query.CountAsync();
@@ -84,6 +76,12 @@ namespace ELS.Vocabularies
                 totalCount,
                 ObjectMapper.Map<List<VocabularyListDto>>(vocabularies)
             );
+        }
+
+        public async Task<VocabularyDto> GetAsync(EntityDto<int> input)
+        {
+            var entity = await GetVocabularyByIdAsync(input.Id);
+            return ObjectMapper.Map<VocabularyDto>(entity);
         }
 
         public async Task<ListResultDto<VocabularyDto>> GetRandomAsync(LimitedResultRequestDto input)

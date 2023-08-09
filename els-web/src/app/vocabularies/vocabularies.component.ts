@@ -1,9 +1,9 @@
 import { Component, Injector } from '@angular/core';
 import { VocabularyLevel2LabelMapping, WordClass2LabelMapping } from '@shared/AppConsts';
-import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
-import { VocabularyDtoPagedResultDto, VocabularyListDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { FilterProperty, VocabularyDtoPagedResultDto, VocabularyListDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
 import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/create-vocabulary-dialog.component';
@@ -11,8 +11,8 @@ import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-voc
 import { ViewVocabularyDialogComponent } from './view-vocabulary-dialog/view-vocabulary-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
-  classification: WordClassEnum | null
-  level: VocabularyLevelEnum | null
+  classification: FilterProperty<WordClassEnum> | null
+  level: FilterProperty<VocabularyLevelEnum> | null
 }
 @Component({
   selector: 'app-vocabularies',
@@ -32,7 +32,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
   wordClassOptions =
     Object
       .values(WordClassEnum)
-      .filter(value => typeof value === 'number');
+      .filter(value => typeof value === 'number' && value !== WordClassEnum.Sentence);
 
   vocabularyLevelOptions =
     Object
@@ -64,8 +64,11 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
     finishedCallback: Function
   ): void {
     request.term = this.term;
-    request.classification = this.classification;
-    request.level = this.level;
+    request.level = FilterProperty.toFilterProperty<VocabularyLevelEnum>(this.level, FilterMethodEnum.Equal);
+    if (this.classification !== undefined)
+      request.classification = FilterProperty.toFilterProperty<WordClassEnum>(this.classification, FilterMethodEnum.Equal);
+    else
+      request.classification = FilterProperty.toFilterProperty<WordClassEnum>(WordClassEnum.Sentence, FilterMethodEnum.NotEqual);
 
     this._vocabularyService
       .getAll(

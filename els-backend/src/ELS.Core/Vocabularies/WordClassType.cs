@@ -35,6 +35,9 @@ namespace ELS.Vocabularies
         Idiom = 10,
 
         [Display(Name = "Other")]
-        Other = 11
+        Other = 11,
+
+        [Display(Name = "Sentence")]
+        Sentence = -1
     }
 }

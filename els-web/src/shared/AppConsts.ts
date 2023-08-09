@@ -34,7 +34,8 @@ export const WordClass2LabelMapping: Record<WordClassEnum, string> = {
     [WordClassEnum.Pronouns]: "Pronouns",
     [WordClassEnum.Exclamation]: "Exclamation",
     [WordClassEnum.Idiom]: "Idiom",
-    [WordClassEnum.Other]: "Other"
+    [WordClassEnum.Other]: "Other",
+    [WordClassEnum.Sentence]: "Sentence"
 };
 
 // optional: Record type annotation guaranties that 

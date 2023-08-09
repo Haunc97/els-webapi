@@ -18,11 +18,19 @@ export enum WordClassEnum {
     Pronouns = 8,
     Exclamation = 9,
     Idiom = 10,
-    Other = 11
+    Other = 11,
+    Sentence = -1
 }
 
 export enum VocabularyLevelEnum {
     Easy = 10,
     Medium = 20,
     Hard = 30
+}
+
+export enum FilterMethodEnum {
+    Equal = 10,
+    NotEqual = 20,
+    Contain = 30,
+    NotContain = 40
 }

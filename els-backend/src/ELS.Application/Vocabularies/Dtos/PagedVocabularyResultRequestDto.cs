@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using ELS.Utils;
 
 namespace ELS.Vocabularies.Dtos
 {
@@ -6,8 +7,8 @@ namespace ELS.Vocabularies.Dtos
     {
         public string Term { get; set; }
 
-        public WordClassType? Classification { get; set; }
+        public FilterProperty<WordClassType> Classification { get; set; }
 
-        public VocabularyLevelType? Level { get; set; }
+        public FilterProperty<VocabularyLevelType> Level { get; set; }
     }
 }
