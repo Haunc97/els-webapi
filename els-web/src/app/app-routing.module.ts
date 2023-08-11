@@ -10,6 +10,7 @@ import { RolesComponent } from 'app/roles/roles.component';
 import { ChangePasswordComponent } from './users/change-password/change-password.component';
 import { VocabulariesComponent } from './vocabularies/vocabularies.component';
 import { FlashcardsComponent } from './activities/flashcards/flashcards.component';
+import { SentencesComponent } from './sentences/sentences.component';
 
 @NgModule({
     imports: [
@@ -25,6 +26,7 @@ import { FlashcardsComponent } from './activities/flashcards/flashcards.componen
                     { path: 'about', component: AboutComponent, canActivate: [AppRouteGuard] },
                     { path: 'update-password', component: ChangePasswordComponent, canActivate: [AppRouteGuard] },
                     { path: 'vocabularies', component: VocabulariesComponent, canActivate: [AppRouteGuard] },
+                    { path: 'sentences', component: SentencesComponent, canActivate: [AppRouteGuard] },
                     { path: 'flashcards', component: FlashcardsComponent, canActivate: [AppRouteGuard] }
                 ]
             }

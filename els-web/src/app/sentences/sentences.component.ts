@@ -6,23 +6,21 @@ import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listin
 import { FilterProperty, VocabularyDtoPagedResultDto, VocabularyListDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
-import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/create-vocabulary-dialog.component';
-import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-vocabulary-dialog.component';
-import { ViewVocabularyDialogComponent } from './view-vocabulary-dialog/view-vocabulary-dialog.component';
+import { CreateSentenceDialogComponent } from './create-sentence-dialog/create-sentence-dialog.component';
+import { EditSentenceDialogComponent } from './edit-sentence-dialog/edit-sentence-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: FilterProperty<WordClassEnum> | null
   level: FilterProperty<VocabularyLevelEnum> | null
 }
 @Component({
-  selector: 'app-vocabularies',
-  templateUrl: './vocabularies.component.html',
+  selector: 'app-sentences',
+  templateUrl: './sentences.component.html',
   animations: [appModuleAnimation()]
 })
-export class VocabulariesComponent extends PagedListingComponentBase<VocabularyListDto> {
-  vocabularies: VocabularyListDto[] = [];
+export class SentencesComponent extends PagedListingComponentBase<VocabularyListDto> {
+  sentences: VocabularyListDto[] = [];
   term = '';
-  classification = undefined;
   level = undefined;
   advancedFiltersVisible = false;
 
@@ -47,13 +45,12 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
     super(injector);
   }
 
-  createVocabulary(): void {
-    this.showCreateOrEditVocabularyDialog();
+  createSentence(): void {
+    this.showCreateOrEditSentenceDialog();
   }
 
   clearFilters(): void {
     this.term = '';
-    this.classification = undefined;
     this.level = undefined;
     this.getDataPage(1);
   }
@@ -65,10 +62,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
   ): void {
     request.term = this.term;
     request.level = FilterProperty.toFilterProperty<VocabularyLevelEnum>(this.level, FilterMethodEnum.Equal);
-    if (this.classification !== undefined)
-      request.classification = FilterProperty.toFilterProperty<WordClassEnum>(this.classification, FilterMethodEnum.Equal);
-    else
-      request.classification = FilterProperty.toFilterProperty<WordClassEnum>(WordClassEnum.Sentence, FilterMethodEnum.NotEqual);
+    request.classification = FilterProperty.toFilterProperty<WordClassEnum>(WordClassEnum.Sentence, FilterMethodEnum.Equal);
 
     this._vocabularyService
       .getAll(
@@ -84,25 +78,25 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
         })
       )
       .subscribe((result: VocabularyDtoPagedResultDto) => {
-        this.vocabularies = result.items;
+        this.sentences = result.items;
         this.showPaging(result, pageNumber);
       });
   }
 
-  editVocabulary(vocabulary: VocabularyListDto): void {
-    this.showCreateOrEditVocabularyDialog(vocabulary.id);
+  editSentence(vocabulary: VocabularyListDto): void {
+    this.showCreateOrEditSentenceDialog(vocabulary.id);
   }
 
-  viewVocabulary(vocabulary: VocabularyListDto): void {
-    this._modalService.show(
-      ViewVocabularyDialogComponent,
-      {
-        class: 'modal-lg',
-        initialState: {
-          id: vocabulary.id,
-        },
-      }
-    );
+  viewSentence(vocabulary: VocabularyListDto): void {
+    // this._modalService.show(
+    //   ViewVocabularyDialogComponent,
+    //   {
+    //     class: 'modal-lg',
+    //     initialState: {
+    //       id: vocabulary.id,
+    //     },
+    //   }
+    // );
   }
 
   protected delete(vocabulary: VocabularyListDto): void {
@@ -120,18 +114,18 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
     );
   }
 
-  private showCreateOrEditVocabularyDialog(id?: number): void {
-    let createOrEditVocabularyDialog: BsModalRef;
+  private showCreateOrEditSentenceDialog(id?: number): void {
+    let createOrEditSentenceDialog: BsModalRef;
     if (!id) {
-      createOrEditVocabularyDialog = this._modalService.show(
-        CreateVocabularyDialogComponent,
+      createOrEditSentenceDialog = this._modalService.show(
+        CreateSentenceDialogComponent,
         {
           class: 'modal-lg',
         }
       );
     } else {
-      createOrEditVocabularyDialog = this._modalService.show(
-        EditVocabularyDialogComponent,
+      createOrEditSentenceDialog = this._modalService.show(
+        EditSentenceDialogComponent,
         {
           class: 'modal-lg',
           initialState: {
@@ -141,7 +135,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
       );
     }
 
-    createOrEditVocabularyDialog.content.onSave.subscribe(() => {
+    createOrEditSentenceDialog.content.onSave.subscribe(() => {
       this.refresh();
     });
   }

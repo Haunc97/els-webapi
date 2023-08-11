@@ -3,14 +3,14 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-6">
-                    <h1>{{ "Vocabularies" | localize }}</h1>
+                    <h1>{{ "Sentences" | localize }}</h1>
                 </div>
                 <div class="col-6 text-right">
                     <a href="javascript:;" class="btn bg-success" [routerLink]="['/app/flashcards']" routerLinkActive="router-link-active">
                         <i class="fa fa-sticky-note"></i>
                         {{ "Learn" | localize }}
                     </a>
-                    <a href="javascript:;" class="btn bg-blue mx-2" (click)="createVocabulary()">
+                    <a href="javascript:;" class="btn bg-blue mx-2" (click)="createSentence()">
                         <i class="fa fa-plus-square"></i>
                         {{ "Create" | localize }}
                     </a>
@@ -65,21 +65,6 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-0">
-                                            <label>{{"Classification" | localize}}</label>
-                                            <select 
-                                                class="form-control show-tick"
-                                                name="class"
-                                                [(ngModel)]="classification">
-                                                <option value="undefined">-- Please select --</option>
-                                                <option *ngFor="let wordClassOption of wordClassOptions"
-                                                        [value]="wordClassOption">
-                                                    {{WordClass2LabelMapping[wordClassOption]}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-0">
                                             <label>{{"Level" | localize}}</label>
                                             <select 
                                                 class="form-control show-tick"
@@ -121,15 +106,14 @@
                             <tr>
                                 <th>{{ "Term" | localize }}</th>
                                 <th>{{ "Definition" | localize }}</th>
-                                <th>{{ "Classification" | localize }}</th>
-                                <th>{{ "Level" | localize }}</th>
+                                <th style="width: 100px;">{{ "Level" | localize }}</th>
                                 <th style="width: 200px;">{{ "Actions" | localize }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr
                                 *ngFor="
-                                    let vocabulary of vocabularies
+                                    let sentence of sentences
                                         | paginate
                                         : {
                                             id: 'server',
@@ -139,15 +123,14 @@
                                             }
                                 "
                             >
-                                <td><span (click)="viewVocabulary(vocabulary)" style="cursor: pointer;">{{ vocabulary.term }}</span></td>
-                                <td>{{ vocabulary.definition }}</td>
-                                <td>{{ WordClass2LabelMapping[vocabulary.classification] | localize }}</td>
-                                <td>{{ VocabularyLevel2LabelMapping[vocabulary.level] | localize }}</td>
+                                <td><span (click)="viewSentence(sentence)" style="cursor: pointer;">{{ sentence.term }}</span></td>
+                                <td>{{ sentence.definition }}</td>
+                                <td>{{ VocabularyLevel2LabelMapping[sentence.level] | localize }}</td>
                                 <td>
                                     <button
                                             type="button"
                                             class="btn btn-sm bg-secondary mx-2"
-                                            (click)="editVocabulary(vocabulary)"
+                                            (click)="editSentence(sentence)"
                                     >
                                         <i class="fas fa-pencil-alt"></i>
                                         {{ "Edit" | localize }}
@@ -155,7 +138,7 @@
                                     <button
                                             type="button"
                                             class="btn btn-sm bg-danger"
-                                            (click)="delete(vocabulary)"
+                                            (click)="delete(sentence)"
                                     >
                                         <i class="fas fa-trash"></i>
                                         {{ "Delete" | localize }}

@@ -44,6 +44,9 @@ import { CreateVocabularyDialogComponent } from './vocabularies/create-vocabular
 import { EditVocabularyDialogComponent } from './vocabularies/edit-vocabulary-dialog/edit-vocabulary-dialog.component';
 import { ViewVocabularyDialogComponent } from './vocabularies/view-vocabulary-dialog/view-vocabulary-dialog.component';
 import { FlashcardsComponent } from './activities/flashcards/flashcards.component';
+import { SentencesComponent } from './sentences/sentences.component';
+import { CreateSentenceDialogComponent } from './sentences/create-sentence-dialog/create-sentence-dialog.component';
+import { EditSentenceDialogComponent } from './sentences/edit-sentence-dialog/edit-sentence-dialog.component';
 
 @NgModule({
     declarations: [
@@ -78,7 +81,10 @@ import { FlashcardsComponent } from './activities/flashcards/flashcards.componen
         CreateVocabularyDialogComponent,
         EditVocabularyDialogComponent,
         ViewVocabularyDialogComponent,
-        FlashcardsComponent
+        FlashcardsComponent,
+        SentencesComponent,
+        CreateSentenceDialogComponent,
+        EditSentenceDialogComponent
     ],
     imports: [
         CommonModule,

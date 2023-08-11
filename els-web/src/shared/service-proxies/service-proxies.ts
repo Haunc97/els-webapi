@@ -1968,9 +1968,9 @@ export class VocabularyServiceProxy {
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetAll?";
         if (term !== undefined)
             url_ += "Term=" + encodeURIComponent("" + term) + "&";
-        if (classification?.term != undefined)
+        if (classification?.term !== undefined)
             url_ += "Classification.Term=" + encodeURIComponent("" + (classification.term !== undefined ? classification.term : "")) + "&" + "Classification.Method=" + encodeURIComponent('' + classification.method) + "&";
-        if (level?.term != undefined)
+        if (level?.term !== undefined)
             url_ += "Level.Term=" + encodeURIComponent("" + (level.term !== undefined ? level.term : "")) + "&" + "Level.Method=" + encodeURIComponent('' + level.method) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
