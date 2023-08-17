@@ -2,7 +2,9 @@
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.Timing;
+using ELS.VocabularyStudySets;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,6 +39,8 @@ namespace ELS.Vocabularies
         public int TenantId { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public ICollection<VocabularyStudySet> VocabularyStudySets { get; set; }
 
         public Vocabulary()
         {

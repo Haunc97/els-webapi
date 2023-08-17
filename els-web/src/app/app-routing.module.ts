@@ -11,6 +11,7 @@ import { ChangePasswordComponent } from './users/change-password/change-password
 import { VocabulariesComponent } from './vocabularies/vocabularies.component';
 import { FlashcardsComponent } from './activities/flashcards/flashcards.component';
 import { SentencesComponent } from './sentences/sentences.component';
+import { StudysetsComponent } from './studysets/studysets.component';
 
 @NgModule({
     imports: [
@@ -27,6 +28,7 @@ import { SentencesComponent } from './sentences/sentences.component';
                     { path: 'update-password', component: ChangePasswordComponent, canActivate: [AppRouteGuard] },
                     { path: 'vocabularies', component: VocabulariesComponent, canActivate: [AppRouteGuard] },
                     { path: 'sentences', component: SentencesComponent, canActivate: [AppRouteGuard] },
+                    { path: 'studysets', component: StudysetsComponent, canActivate: [AppRouteGuard] },
                     { path: 'flashcards', component: FlashcardsComponent, canActivate: [AppRouteGuard] }
                 ]
             }

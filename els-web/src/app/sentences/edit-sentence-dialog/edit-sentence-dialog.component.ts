@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { VocabularyLevel2LabelMapping } from '@shared/AppConsts';
+import { VocabularyLevelEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
 import { VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -13,6 +15,13 @@ export class EditSentenceDialogComponent extends AppComponentBase
   sentence = new VocabularyDto();
   id: number;
 
+  public VocabularyLevel2LabelMapping = VocabularyLevel2LabelMapping;
+  
+  vocabularyLevelOptions =
+    Object
+      .values(VocabularyLevelEnum)
+      .filter(value => typeof value === 'number');
+      
   @Output() onSave = new EventEmitter<any>();
 
   constructor(

@@ -1,4 +1,4 @@
-import { VocabularyLevelEnum, WordClassEnum } from "./AppEnums";
+import { StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from "./AppEnums";
 
 export class AppConsts {
 
@@ -44,4 +44,9 @@ export const VocabularyLevel2LabelMapping: Record<VocabularyLevelEnum, string> =
     [VocabularyLevelEnum.Easy]: "Easy",
     [VocabularyLevelEnum.Medium]: "Medium",
     [VocabularyLevelEnum.Hard]: "Hard"
+};
+
+export const StudySetTypeConfig2LabelMapping: Record<StudySetTypeConfigEnum, string> = {
+    [StudySetTypeConfigEnum.ExcludeSentence]: "Exclude Sentence",
+    [StudySetTypeConfigEnum.SentenceOnly]: "Sentence Only"
 };

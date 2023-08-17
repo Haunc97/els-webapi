@@ -1,0 +1,140 @@
+<form
+    class="form-horizontal"
+    autocomplete="off"
+    #createStdSetModal="ngForm"
+    (ngSubmit)="save()"
+>
+<abp-modal-header
+    [title]="'CreateNewStudySet' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+></abp-modal-header>
+    <div class="modal-body">
+        <tabset>
+            <tab [heading]="'General' | localize" class="pt-3 px-2">
+                <div class="form-group row required">
+                    <label class="col-md-3 col-form-label" for="title">
+                        {{ "Title" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="title"
+                            id="title"
+                            required
+                            maxlength="32"
+                            [(ngModel)]="stdSet.title"
+                            #titleModel="ngModel"
+                            #titleEl
+                        />
+                        <abp-validation-summary
+                            [control]="titleModel"
+                            [controlEl]="titleEl"
+                        ></abp-validation-summary>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="desc">
+                    {{ "Description" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                        <textarea
+                            rows="3"
+                            class="form-control"
+                            name="desc"
+                            id="desc"
+                            maxlength="512"
+                            [(ngModel)]="stdSet.description"
+                            #descModel="ngModel"
+                            #descEl
+                        ></textarea>
+                        <abp-validation-summary
+                            [control]="descModel"
+                            [controlEl]="descEl"
+                        ></abp-validation-summary>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="typeCfg">
+                        {{ "WordTypeConfig" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                        <select
+                            class="form-control show-tick"
+                            name="typeCfg"
+                            [(ngModel)]="stdSet.wordTypeConfig">
+                            <option value="undefined">-- Please select --</option>
+                            <option *ngFor="let typeConfigOption of typeConfigOptions"
+                                    [value]="typeConfigOption">
+                                {{StudySetTypeConfig2LabelMapping[typeConfigOption]}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </tab>
+            <tab [heading]="'Vocabularies' | localize" class="pt-3 px-2">
+                <div class="form-group row mb-0">
+                    <div class="form-group col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span 
+                                    class="input-group-text"
+                                    id="searchVoc">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Search vocabulary..."
+                                aria-label="Recipient's username"
+                                aria-describedby="searchVoc"
+                                name="searchVoc"
+                                id="searchVoc"
+                                maxlength="32"
+                                [(ngModel)]="keyword"
+                                (ngModelChange)="searchChange()"
+                                #searchVocModel="ngModel"
+                                #searchVocEl
+                            />
+                        </div>
+                        <div
+                            class="search-result-container"
+                            style="height: 200px;
+                                    overflow-y: auto;"
+                            [busy]="isDataLoading">
+                            <ul class="list-group list-group-flush">
+                                <li 
+                                    *ngFor="let vocabulary of vocabularies; let i = index"
+                                    class="list-group-item"
+                                    style="cursor: pointer;"
+                                    (click)="toggleSelectVocabulary(vocabulary)">
+                                    <i *ngIf="vocabulary.isSelected" class="fa fa-check text-success"></i>
+                                    {{vocabulary.text}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 w-100"
+                        style="height: 253px;
+                                overflow-y: auto;">
+                        <div><strong>{{'SelectedItems' | localize}}</strong></div>
+                        <ul class="list-group list-group-flush">
+                            <li 
+                                *ngFor="let vocabulary of selectedVocabularies; let i = index"
+                                style="cursor: pointer;"
+                                (click)="unselectVocabulary(vocabulary)"
+                                class="list-group-item">{{vocabulary.term}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
+    </div>
+    <abp-modal-footer
+        [cancelDisabled]="saving"
+        [saveDisabled]="!createStdSetModal.form.valid || saving"
+        (onCancelClick)="bsModalRef.hide()"
+    ></abp-modal-footer>
+</form>

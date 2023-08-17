@@ -47,6 +47,10 @@ import { FlashcardsComponent } from './activities/flashcards/flashcards.componen
 import { SentencesComponent } from './sentences/sentences.component';
 import { CreateSentenceDialogComponent } from './sentences/create-sentence-dialog/create-sentence-dialog.component';
 import { EditSentenceDialogComponent } from './sentences/edit-sentence-dialog/edit-sentence-dialog.component';
+import { ViewSentenceDialogComponent } from './sentences/view-sentence-dialog/view-sentence-dialog.component';
+import { StudysetsComponent } from './studysets/studysets.component';
+import { CreateStudysetDialogComponent } from './studysets/create-studyset-dialog/create-studyset-dialog.component';
+import { EditStudysetDialogComponent } from './studysets/edit-studyset-dialog/edit-studyset-dialog.component';
 
 @NgModule({
     declarations: [
@@ -84,7 +88,11 @@ import { EditSentenceDialogComponent } from './sentences/edit-sentence-dialog/ed
         FlashcardsComponent,
         SentencesComponent,
         CreateSentenceDialogComponent,
-        EditSentenceDialogComponent
+        EditSentenceDialogComponent,
+        ViewSentenceDialogComponent,
+        StudysetsComponent,
+        CreateStudysetDialogComponent,
+        EditStudysetDialogComponent
     ],
     imports: [
         CommonModule,

@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.Extensions;
 using Abp.Linq.Extensions;
 using ELS.Authorization;
 using ELS.Utils;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -65,8 +67,8 @@ namespace ELS.Vocabularies
             var query = _vocabularyRepository
                 .GetAll()
                 .WhereIf(!string.IsNullOrEmpty(input.Term), v => v.Term.ToLower().IndexOf(input.Term.ToLower()) >= 0)
-                .WhereIf(input.Classification != null, FilterExpression.GetExpression<Vocabulary, WordClassType>(input.Classification, nameof(Vocabulary.Classification)))
-                .WhereIf(input.Level != null, FilterExpression.GetExpression<Vocabulary, VocabularyLevelType>(input.Level, nameof(Vocabulary.Level)))
+                .WhereIf(input.Classification != null, GetFilter(input.Classification, nameof(Vocabulary.Classification)))
+                .WhereIf(input.Level != null, GetFilter(input.Level, nameof(Vocabulary.Level)))
                 .OrderByDescending(v => v.CreationTime);
 
             var totalCount = await query.CountAsync();
@@ -84,16 +86,39 @@ namespace ELS.Vocabularies
             return ObjectMapper.Map<VocabularyDto>(entity);
         }
 
-        public async Task<ListResultDto<VocabularyDto>> GetRandomAsync(LimitedResultRequestDto input)
+        public async Task<ListResultDto<VocabularyDto>> GetRandomAsync(GetRandomVocabularyRequestDto input)
         {
             var vocabularies = await _vocabularyRepository
                .GetAll()
+               .WhereIf(input.StudySetId.HasValue, v => v.VocabularyStudySets.Any(s => s.StudySetId == input.StudySetId))
+               .WhereIf(input.Classification != null, GetFilter(input.Classification, nameof(Vocabulary.Classification)))
+               .WhereIf(input.Level != null, GetFilter(input.Level, nameof(Vocabulary.Level)))
                .OrderBy(r => Guid.NewGuid()).Take(input.MaxResultCount)
                .ToListAsync();
 
             return new ListResultDto<VocabularyDto>(ObjectMapper.Map<List<VocabularyDto>>(vocabularies));
         }
+
+        public async Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(GetVocabularySelectionRequestDto input)
+        {
+            var vocabularies = await _vocabularyRepository
+                .GetAll()
+                .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), v => v.Term.Contains(input.Keyword))
+                .OrderByDescending(v => v.CreationTime)
+                .Take(input.MaxResultCount)
+                .ToListAsync();
+
+            var dropdownItems = vocabularies.Select(x => new DropdownItemDto<int>(x.Term, x.Id)).ToList();
+            return new ListResultDto<DropdownItemDto<int>>(dropdownItems);
+        }
         #endregion
+
+        private Expression<Func<Vocabulary, bool>> GetFilter<T>(
+            FilterProperty<T> filter,
+            string propertyName)
+        {
+            return FilterExpression.GetExpression<Vocabulary, T>(filter, propertyName);
+        }
 
         protected void CheckPermission(string permissionName)
         {

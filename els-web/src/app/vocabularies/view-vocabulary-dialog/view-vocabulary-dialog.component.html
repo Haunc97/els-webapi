@@ -3,14 +3,28 @@
     (onCloseClick)="bsModalRef.hide()"
 ></abp-modal-header>
 <div class="modal-body">
-    <h2 class="text-info">{{vocabulary.term}}</h2>
-    <p class="text-info text-lowercase"><em>{{WordClass2LabelMapping[vocabulary.classification] | localize}}</em></p>
-    <p class="text-info">{{vocabulary.phonetics}}</p>
+    <h3 class="text-primary">
+        {{vocabulary.term}}
+    </h3>
+    <p class="text-primary text-lowercase">
+        <em>
+            {{WordClass2LabelMapping[vocabulary.classification] | localize}}
+        </em>
+    </p>
+    <p class="text-primary">
+        {{vocabulary.phonetics}}
+    </p>
+    <p>
+        {{vocabulary.definition}}
+    </p>
     <hr class="hr hr-blurry bg-light" />
-    <p><strong>{{vocabulary.description}}</strong></p>
-    <div *ngIf="vocabulary.example"><strong>{{'E.g.' | localize}}</strong></div>
-    <p style="white-space: pre-line;"><em>{{vocabulary.example}}</em></p>
+    <p style="white-space: pre-line;">
+        <strong>
+            {{vocabulary.description}}
+        </strong>
+    </p>
+    <p style="white-space: pre-line;">
+        <em>
+            {{vocabulary.example}}
+        </em></p>
 </div>
-<!-- <abp-modal-footer
-    (onCancelClick)="bsModalRef.hide()"
-></abp-modal-footer> -->

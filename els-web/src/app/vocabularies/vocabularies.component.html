@@ -6,7 +6,7 @@
                     <h1>{{ "Vocabularies" | localize }}</h1>
                 </div>
                 <div class="col-6 text-right">
-                    <a href="javascript:;" class="btn bg-success" [routerLink]="['/app/flashcards']" routerLinkActive="router-link-active">
+                    <a href="javascript:;" class="btn bg-success" [routerLink]="['/app/flashcards']" [queryParams]="{'classification.term': WordClassEnum.Sentence, 'classification.method': FilterMethodEnum.NotEqual}" routerLinkActive="router-link-active">
                         <i class="fa fa-sticky-note"></i>
                         {{ "Learn" | localize }}
                     </a>

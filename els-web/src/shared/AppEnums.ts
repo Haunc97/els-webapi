@@ -28,6 +28,11 @@ export enum VocabularyLevelEnum {
     Hard = 30
 }
 
+export enum StudySetTypeConfigEnum {
+    SentenceOnly = 1,
+    ExcludeSentence = 2
+}
+
 export enum FilterMethodEnum {
     Equal = 10,
     NotEqual = 20,

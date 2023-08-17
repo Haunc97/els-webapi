@@ -8,6 +8,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
 import { CreateSentenceDialogComponent } from './create-sentence-dialog/create-sentence-dialog.component';
 import { EditSentenceDialogComponent } from './edit-sentence-dialog/edit-sentence-dialog.component';
+import { ViewSentenceDialogComponent } from './view-sentence-dialog/view-sentence-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: FilterProperty<WordClassEnum> | null
@@ -26,6 +27,8 @@ export class SentencesComponent extends PagedListingComponentBase<VocabularyList
 
   public WordClass2LabelMapping = WordClass2LabelMapping;
   public VocabularyLevel2LabelMapping = VocabularyLevel2LabelMapping;
+  public WordClassEnum = WordClassEnum;
+  public FilterMethodEnum = FilterMethodEnum;
 
   wordClassOptions =
     Object
@@ -83,29 +86,29 @@ export class SentencesComponent extends PagedListingComponentBase<VocabularyList
       });
   }
 
-  editSentence(vocabulary: VocabularyListDto): void {
-    this.showCreateOrEditSentenceDialog(vocabulary.id);
+  editSentence(sentence: VocabularyListDto): void {
+    this.showCreateOrEditSentenceDialog(sentence.id);
   }
 
-  viewSentence(vocabulary: VocabularyListDto): void {
-    // this._modalService.show(
-    //   ViewVocabularyDialogComponent,
-    //   {
-    //     class: 'modal-lg',
-    //     initialState: {
-    //       id: vocabulary.id,
-    //     },
-    //   }
-    // );
+  viewSentence(sentence: VocabularyListDto): void {
+    this._modalService.show(
+      ViewSentenceDialogComponent,
+      {
+        class: 'modal-lg',
+        initialState: {
+          id: sentence.id,
+        },
+      }
+    );
   }
 
-  protected delete(vocabulary: VocabularyListDto): void {
+  protected delete(sentence: VocabularyListDto): void {
     abp.message.confirm(
-      this.l('VocabularyDeleteWarningMessage', vocabulary.term),
+      this.l('VocabularyDeleteWarningMessage', sentence.term),
       undefined,
       (result: boolean) => {
         if (result) {
-          this._vocabularyService.delete(vocabulary.id).subscribe(() => {
+          this._vocabularyService.delete(sentence.id).subscribe(() => {
             abp.notify.success(this.l('SuccessfullyDeleted'));
             this.refresh();
           });

@@ -14,7 +14,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import * as moment from 'moment';
-import { FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { FilterMethodEnum, StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
@@ -2027,9 +2027,18 @@ export class VocabularyServiceProxy {
     }
 
     getRandom(
+        studySetId: number | undefined,
+        classification: FilterProperty<WordClassEnum> | undefined,
+        level: FilterProperty<VocabularyLevelEnum> | undefined,
         maxResultCount: number | undefined): Observable<VocabularyDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetRandom?";
         
+        if (studySetId !== undefined)
+            url_ += "StudySetId=" + encodeURIComponent("" + studySetId) + "&";
+        if (classification?.term !== undefined)
+            url_ += "Classification.Term=" + encodeURIComponent("" + (classification.term !== undefined ? classification.term : "")) + "&" + "Classification.Method=" + encodeURIComponent('' + classification.method) + "&";
+        if (level?.term !== undefined)
+            url_ += "Level.Term=" + encodeURIComponent("" + (level.term !== undefined ? level.term : "")) + "&" + "Level.Method=" + encodeURIComponent('' + level.method) + "&";
         if (maxResultCount !== undefined)
             url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
@@ -2068,6 +2077,62 @@ export class VocabularyServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = VocabularyDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getSelection(
+        keyword: string | undefined,
+        maxResultCount: number | undefined): Observable<VocabularySelectionDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetSelection?";
+        if (keyword === null)
+            throw new Error("The parameter 'keyword' cannot be null.");
+        else if (keyword !== undefined)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSelection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSelection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VocabularySelectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VocabularySelectionDto>;
+        }));
+    }
+
+    protected processGetSelection(response: HttpResponseBase): Observable<VocabularySelectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularySelectionDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -2180,6 +2245,298 @@ export class VocabularyServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = VocabularyDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class StudySetServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateStudySetDto | undefined): Observable<StudySetDto> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StudySetDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StudySetDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<StudySetDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StudySetDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+    
+    getAll( keyword: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<StudySetDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/GetAll?";
+        if (keyword === null)
+            throw new Error("The parameter 'keyword' cannot be null.");
+        else if (keyword !== undefined)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StudySetDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StudySetDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<StudySetDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StudySetDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: number | undefined): Observable<StudySetDto> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StudySetDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StudySetDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<StudySetDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StudySetDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: StudySetDto | undefined): Observable<StudySetDto> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StudySetDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StudySetDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<StudySetDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StudySetDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -4313,7 +4670,7 @@ export class VocabularyDtoListResultDto implements IVocabularyDtoListResultDto
     }
 }
 export interface IVocabularyDtoListResultDto extends IListResultDto<VocabularyDto>
-{ 
+{
 }
 
 export class VocabularyDtoPagedResultDto implements IVocabularyDtoPagedResultDto {
@@ -4369,6 +4726,55 @@ export class VocabularyDtoPagedResultDto implements IVocabularyDtoPagedResultDto
 export interface IVocabularyDtoPagedResultDto {
     items: VocabularyListDto[] | undefined;
     totalCount: number;
+}
+
+export class VocabularySelectionDto implements IVocabularySelectionDto {
+    items: DropdownItemDto<number>[];
+
+    constructor(data?: IVocabularySelectionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                this.items.push(DropdownItemDto.fromJS<number>(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): VocabularySelectionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VocabularySelectionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+        data["items"] = [];
+        for (let item of this.items)
+            data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): VocabularySelectionDto {
+        const json = this.toJSON();
+        let result = new VocabularySelectionDto();
+        result.init(json);
+        return result;
+    }
+}
+export interface IVocabularySelectionDto extends IListResultDto<DropdownItemDto<number>> {
 }
 
 export class CreateVocabularyDto implements ICreateVocabularyDto {
@@ -4438,6 +4844,251 @@ export interface ICreateVocabularyDto {
     example: string;
 }
 
+export class SelectedVocabularyDto implements ISelectedVocabularyDto
+{
+    id: number;
+    term: string;
+
+    constructor(data?: ISelectedVocabularyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.term = _data["term"];
+        }
+    }
+
+    static fromJS(data: any): SelectedVocabularyDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectedVocabularyDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["term"] = this.term;
+        return data;
+    }
+
+    clone(): SelectedVocabularyDto {
+        const json = this.toJSON();
+        let result = new SelectedVocabularyDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ISelectedVocabularyDto {
+    id: number;
+    term: string;
+}
+
+export class StudySetDto implements IStudySetDto {
+    id: number;
+    title: string;
+    description: string | undefined;
+    wordTypeConfig: StudySetTypeConfigEnum | undefined;
+    levelConfig: VocabularyLevelEnum | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    vocabularies: SelectedVocabularyDto[] | undefined;
+
+    constructor(data?: IStudySetDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.wordTypeConfig = _data["wordTypeConfig"];
+            this.levelConfig = _data["levelConfig"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            if (Array.isArray(_data["vocabularies"])) {
+                this.vocabularies = [] as any;
+                for (let item of _data["vocabularies"])
+                    this.vocabularies.push(SelectedVocabularyDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StudySetDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StudySetDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["wordTypeConfig"] = this.wordTypeConfig;
+        data["levelConfig"] = this.levelConfig;
+        data["lastModificationTime"] = this.lastModificationTime;
+        if (Array.isArray(this.vocabularies)) {
+            data["vocabularies"] = [];
+            for (let item of this.vocabularies)
+                data["vocabularies"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): StudySetDto {
+        const json = this.toJSON();
+        let result = new StudySetDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IStudySetDto {
+    id: number;
+    title: string;
+    description: string | undefined;
+    wordTypeConfig: StudySetTypeConfigEnum | undefined;
+    levelConfig: VocabularyLevelEnum | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    vocabularies: SelectedVocabularyDto[] | undefined;
+}
+
+export class StudySetDtoPagedResultDto implements IStudySetDtoPagedResultDto {
+    items: StudySetDto[] | undefined;
+    totalCount: number;
+
+    constructor(data?: IStudySetDtoPagedResultDto) {
+        if (data) {
+        for (var property in data) {
+            if (data.hasOwnProperty(property))
+            (<any>this)[property] = (<any>data)[property];
+        }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+        if (Array.isArray(_data["items"])) {
+            this.items = [] as any;
+            for (let item of _data["items"])
+            this.items.push(StudySetDto.fromJS(item));
+        }
+        this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): StudySetDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StudySetDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+        data["items"] = [];
+        for (let item of this.items)
+            data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): StudySetDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new StudySetDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IStudySetDtoPagedResultDto {
+    items: StudySetDto[] | undefined;
+    totalCount: number;
+}
+
+export class CreateStudySetDto implements ICreateStudySetDto {
+    title: string;
+    description: string | undefined;
+    wordTypeConfig: StudySetTypeConfigEnum | undefined;
+    levelConfig: VocabularyLevelEnum | undefined;
+    vocabularyIds: number[] | undefined;
+
+    constructor(data?: ICreateStudySetDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.wordTypeConfig = _data["wordTypeConfig"];
+            this.levelConfig = _data["levelConfig"];
+            if (Array.isArray(_data["vocabularyIds"])) {
+                this.vocabularyIds = [] as any;
+                for (let item of _data["vocabularyIds"])
+                    this.vocabularyIds.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateStudySetDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateStudySetDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["wordTypeConfig"] = this.wordTypeConfig;
+        data["levelConfig"] = this.levelConfig;
+        if (Array.isArray(this.vocabularyIds)) {
+            data["vocabularyIds"] = [];
+            for (let item of this.vocabularyIds)
+                data["vocabularyIds"].push(item);
+        }
+        return data;
+    }
+
+    clone(): CreateStudySetDto {
+        const json = this.toJSON();
+        let result = new CreateStudySetDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateStudySetDto {
+    title: string;
+    description: string | undefined;
+    wordTypeConfig: StudySetTypeConfigEnum | undefined;
+    levelConfig: VocabularyLevelEnum | undefined;
+    vocabularyIds: number[] | undefined;
+}
+
 export class FilterProperty<T> implements IFilterProperty<T>
 {
     term: T | undefined;
@@ -4489,9 +5140,54 @@ export interface IListResultDto<T> {
     items: T[] | undefined;
 }
 
-export interface ItemOptionDto<T> {
-    name: string,
-    value: T
+export class DropdownItemDto<T> implements IDropdownItemDto<T> {
+    text: string;
+    value: T;
+    isSelected: boolean;
+
+    constructor(data?: IDropdownItemDto<T>) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.text = _data["text"];
+            this.value = _data["value"];
+            this.isSelected = _data["isSelected"];
+        }
+    }
+
+    static fromJS<T>(data: any) {
+        data = typeof data === 'object' ? data : {};
+        let result = new DropdownItemDto<T>();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["text"] = this.text;
+        data["value"] = this.value;
+        data["isSelected"] = this.isSelected;
+        return data;
+    }
+
+    clone(): DropdownItemDto<T> {
+        const json = this.toJSON();
+        let result = new DropdownItemDto<T>();
+        result.init(json);
+        return result;
+    }
+}
+export interface IDropdownItemDto<T> {
+    text: string,
+    value: T,
+    isSelected: boolean;
 }
 
 export interface IUserLoginInfoDto {

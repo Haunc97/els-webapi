@@ -1,0 +1,21 @@
+<abp-modal-header
+    [title]="'ViewSentence' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+></abp-modal-header>
+<div class="modal-body">
+    <p 
+        class="text-primary"
+        style="white-space: pre-line;">
+        {{sentence.term}}
+    </p>
+    <p class="text-primary">
+        {{sentence.phonetics}}
+    </p>
+    <p>
+        {{sentence.definition}}
+    </p>
+    <hr class="hr hr-blurry bg-light" />
+    <p style="white-space: pre-line;">
+        {{sentence.description}}
+    </p>
+</div>

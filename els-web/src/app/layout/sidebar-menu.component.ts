@@ -48,11 +48,16 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem(
                 this.l('Vocabularies'),
                 '/app/vocabularies',
-                'fas fa-th-list'
+                'fa fa-list'
             ),
             new MenuItem(
                 this.l('Sentences'),
                 '/app/sentences',
+                'fa fa-list'
+            ),
+            new MenuItem(
+                this.l('StudySets'),
+                '/app/studysets',
                 'fas fa-th-list'
             ),
             new MenuItem(

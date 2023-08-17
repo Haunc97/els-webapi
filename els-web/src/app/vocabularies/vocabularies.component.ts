@@ -28,6 +28,8 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
 
   public WordClass2LabelMapping = WordClass2LabelMapping;
   public VocabularyLevel2LabelMapping = VocabularyLevel2LabelMapping;
+  public WordClassEnum = WordClassEnum;
+  public FilterMethodEnum = FilterMethodEnum;
 
   wordClassOptions =
     Object

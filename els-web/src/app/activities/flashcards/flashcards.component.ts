@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { WordClass2LabelMapping } from '@shared/AppConsts';
-import { VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { FilterProperty, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CarouselComponent, CarouselConfig } from 'ngx-bootstrap/carousel';
-import {StringHelper} from '../../../shared/helpers/AppHelpers'
-
+import { StringHelper } from '../../../shared/helpers/AppHelpers'
+import { ActivatedRoute } from '@angular/router';
+import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 @Component({
   selector: 'app-flashcards',
   templateUrl: './flashcards.component.html',
@@ -28,18 +30,43 @@ export class FlashcardsComponent
   curVocabulary: VocabularyDto | undefined;
   resultToggled: boolean = false;
 
-  constructor(public _vocabularyService: VocabularyServiceProxy) { }
+  constructor(
+    public _vocabularyService: VocabularyServiceProxy,
+    public route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this._vocabularyService.getRandom(undefined).subscribe((result) => {
-      this.vocabularies = result.items;
-      this.processSlides();
-    });
+    this.loadRandomVocabularies();
   }
 
-  processSlides() {
+  async loadRandomVocabularies() {
+    let params = await firstValueFrom(this.route.queryParams); // Wait for the first value from the Observable
+    let studySetId = params['stdsetid'];
+    let wordClassFilter = undefined;
+    let vocabularyLevelFilter = undefined;
+
+    let wordClassTerm = params['classification.term'];
+    let wordClassMethod = params['classification.method'];
+    let vocabularyLevelTerm = params['level.term'];
+    let vocabularyLevelMethod = params['level.method'];
+    if (wordClassTerm !== undefined)
+      wordClassFilter = FilterProperty.toFilterProperty<WordClassEnum>(wordClassTerm, wordClassMethod);
+    if (vocabularyLevelTerm !== undefined)
+      vocabularyLevelFilter = FilterProperty.toFilterProperty<VocabularyLevelEnum>(vocabularyLevelTerm, vocabularyLevelMethod);
+
+    let response = await firstValueFrom(this._vocabularyService.getRandom(
+      studySetId,
+      wordClassFilter,
+      vocabularyLevelFilter,
+      undefined
+    )); // Wait for the last value from the Observable
+    
+    this.vocabularies = response.items;
+    this.renderSlides();
+  }
+
+  renderSlides() {
     this.slides = [];
-    let img = `assets/img/${StringHelper.getRandomString(this.imgs)}`; 
+    let img = `assets/img/${StringHelper.getRandomString(this.imgs)}`;
     this.vocabularies.forEach(vocabulary => {
       this.slides.push({
         image: img,

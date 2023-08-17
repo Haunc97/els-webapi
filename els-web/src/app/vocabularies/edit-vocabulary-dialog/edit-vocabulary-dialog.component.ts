@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { VocabularyLevel2LabelMapping, WordClass2LabelMapping } from '@shared/AppConsts';
+import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
 import { VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -13,6 +15,19 @@ export class EditVocabularyDialogComponent extends AppComponentBase
   vocabulary = new VocabularyDto();
   id: number;
 
+  public WordClass2LabelMapping = WordClass2LabelMapping;
+  public VocabularyLevel2LabelMapping = VocabularyLevel2LabelMapping;
+
+  wordClassOptions =
+    Object
+      .values(WordClassEnum)
+      .filter(value => typeof value === 'number' && value !== WordClassEnum.Sentence);
+
+  vocabularyLevelOptions =
+    Object
+      .values(VocabularyLevelEnum)
+      .filter(value => typeof value === 'number');
+      
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
@@ -26,7 +41,6 @@ export class EditVocabularyDialogComponent extends AppComponentBase
   ngOnInit(): void {
     this._vocabularyService.get(this.id).subscribe((result) => {
       this.vocabulary = result;
-      console.log("🚀 ~ file: edit-vocabulary-dialog.component.ts:29 ~ this._vocabularyService.get ~ this.vocabulary:", this.vocabulary)
     });
   }
 

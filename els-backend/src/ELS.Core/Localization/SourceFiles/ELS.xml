@@ -121,6 +121,14 @@
 		<text name="CreateNewVocabulary" value="Create new vocabulary" />
 		<text name="EditVocabulary" value="Edit vocabulary" />
 		<text name="ViewVocabulary" value="View vocabulary" />
-		
+		<text name="CreateNewSentence" value="Create new sentence" />
+		<text name="EditSentence" value="Edit sentence" />
+		<text name="ViewSentence" value="View sentence" />
+		<text name="StudySets" value="Study Sets" />
+		<text name="VocabularyQty" value="Vocabulary Qty" />
+		<text name="WordTypeConfig" value="Word Type Config" />
+		<text name="SelectedItems" value="Selected Item(s)" />
+		<text name="EditStudySet" value="Edit study set" />
+		<text name="CreateNewStudySet" value="Create new study set" />
 	</texts>
 </localizationDictionary>
