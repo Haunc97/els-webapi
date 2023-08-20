@@ -1,0 +1,220 @@
+<form
+    class="form-horizontal"
+    autocomplete="off"
+    #createBulkSentenceModal="ngForm"
+    (ngSubmit)="save()"
+>
+<abp-modal-header
+    [title]="'CreateBulkSentences' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+></abp-modal-header>
+    <div class="modal-body">
+        <tabset>
+            <tab
+                [heading]="'General' | localize"
+                class="pt-3 px-2"
+                style="max-height: 550px;
+                        overflow-y: auto;">
+                <div class="card" *ngFor="let sentence of sentences; let index = index">
+                    <div
+                        class="card-header"
+                        (click)="sentence.isCollapsed = !sentence.isCollapsed"
+                        style="cursor: pointer;"
+                    >
+                        <span><strong>{{'Sentence' | localize}} #{{index + 1}} </strong></span>
+                        <div class="card-actions float-right">
+                            <button
+                                type="button"
+                                class="btn btn-sm bg-danger"
+                                *ngIf="sentences.length > 1"
+                                (click)="deleteSentence(index)"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="container-fluid pt-2" [collapse]="sentence.isCollapsed" [isAnimated]="true">
+                        <div class="form-group row required">
+                            <label class="col-md-3 col-form-label" for="name">
+                                {{ "Term" | localize }}
+                            </label>
+                            <div class="col-md-9">
+                                <textarea
+                                    rows="3"
+                                    class="form-control"
+                                    name="{{index}}_term"
+                                    id="{{index}}_term"
+                                    maxlength="512"
+                                    required
+                                    [(ngModel)]="sentence.term"
+                                    #termModel="ngModel"
+                                    #termEl
+                                ></textarea>
+                                <abp-validation-summary
+                                    [control]="termModel"
+                                    [controlEl]="termEl"
+                                ></abp-validation-summary>
+                        </div>
+                        </div>
+                        <div class="form-group row required">
+                            <label class="col-md-3 col-form-label" for="surname">
+                                {{ "Definition" | localize }}
+                            </label>
+                            <div class="col-md-9">
+                                <textarea
+                                    rows="3"
+                                    class="form-control"
+                                    name="{{index}}_def"
+                                    id="{{index}}_def"
+                                    maxlength="512"
+                                    required
+                                    [(ngModel)]="sentence.definition"
+                                    #defModel="ngModel"
+                                    #defEl
+                                ></textarea>
+                                <abp-validation-summary
+                                    [control]="defModel"
+                                    [controlEl]="defEl"
+                                ></abp-validation-summary>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="surname">
+                            {{ "Phonetics" | localize }}
+                            </label>
+                            <div class="col-md-9">
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="{{index}}_phonetics"
+                                id="{{index}}_phonetics"
+                                maxlength="32"
+                                [(ngModel)]="sentence.phonetics"
+                                #phoneticsModel="ngModel"
+                                #phoneticsEl
+                            />
+                            <abp-validation-summary
+                                [control]="phoneticsModel"
+                                [controlEl]="phoneticsEl"
+                            ></abp-validation-summary>
+                            </div>
+                        </div>
+                        <div class="form-group row required">
+                            <label class="col-md-3 col-form-label" for="surname">
+                            {{ "Level" | localize }}
+                            </label>
+                            <div class="col-md-9">
+                                <select 
+                                    class="form-control show-tick"
+                                    name="{{index}}_lv"
+                                    required
+                                    [(ngModel)]="sentence.level"
+                                    #lvModel="ngModel"
+                                    #lvEl
+                                >
+                                    <!-- <option value="undefined">-- Please select --</option> -->
+                                    <option *ngFor="let vocabularyLevelOption of vocabularyLevelOptions"
+                                            [value]="vocabularyLevelOption">
+                                        {{VocabularyLevel2LabelMapping[vocabularyLevelOption]}}
+                                    </option>
+                                </select>
+                                <abp-validation-summary
+                                    [control]="lvModel"
+                                    [controlEl]="lvEl"
+                                ></abp-validation-summary>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="surname">
+                            {{ "Description" | localize }}
+                            </label>
+                            <div class="col-md-9">
+                            <textarea
+                                rows="3"
+                                class="form-control"
+                                name="{{index}}_desc"
+                                id="{{index}}_desc"
+                                maxlength="512"
+                                [(ngModel)]="sentence.description"
+                                #descModel="ngModel"
+                                #descEl
+                            ></textarea>
+                            <abp-validation-summary
+                                [control]="descModel"
+                                [controlEl]="descEl"
+                            ></abp-validation-summary>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn bg-blue" (click)="addSentence()">
+                    <i class="fa fa-plus-square"></i>
+                    {{ "Add" | localize }}
+                </button>
+            </tab>
+            <tab [heading]="'StudySets' | localize" class="pt-3 px-2">
+                <div class="form-group row mb-0">
+                    <div class="form-group col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span 
+                                    class="input-group-text"
+                                    id="searchStdSet">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Search study set..."
+                                aria-label="Recipient's username"
+                                aria-describedby="searchStdSet"
+                                name="searchStdSet"
+                                id="searchStdSet"
+                                maxlength="32"
+                                [(ngModel)]="keyword"
+                                (ngModelChange)="searchChange()"
+                                #searchStdSetModel="ngModel"
+                                #searchStdSetEl
+                            />
+                        </div>
+                        <div
+                            class="search-result-container"
+                            style="height: 200px;
+                                    overflow-y: auto;"
+                            [busy]="loading">
+                            <ul class="list-group list-group-flush">
+                                <li 
+                                    *ngFor="let studySet of studySets; let i = index"
+                                    class="list-group-item"
+                                    style="cursor: pointer;"
+                                    (click)="toggleSelectStudySet(studySet)">
+                                    <i *ngIf="studySet.isSelected" class="fa fa-check text-success"></i>
+                                    {{studySet.text}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 w-100"
+                        style="height: 253px;
+                                overflow-y: auto;">
+                        <div><strong>{{'SelectedItems' | localize}}</strong></div>
+                        <ul class="list-group list-group-flush">
+                            <li 
+                                *ngFor="let studySet of selectedStudySets; let i = index"
+                                style="cursor: pointer;"
+                                (click)="unselectStudySet(studySet)"
+                                class="list-group-item">{{studySet.title}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
+    </div>
+    <abp-modal-footer
+        [cancelDisabled]="saving"
+        [saveDisabled]="!createBulkSentenceModal.form.valid || saving"
+        (onCancelClick)="bsModalRef.hide()"
+    ></abp-modal-footer>
+</form>

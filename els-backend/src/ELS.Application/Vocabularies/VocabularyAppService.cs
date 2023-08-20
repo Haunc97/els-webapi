@@ -2,6 +2,7 @@
 using Abp.Authorization;
 using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
+using Abp.EntityFrameworkCore.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using ELS.Authorization;
@@ -61,6 +62,33 @@ namespace ELS.Vocabularies
             await CurrentUnitOfWork.SaveChangesAsync();
 
             return ObjectMapper.Map<VocabularyDto>(entity);
+        }
+
+        public async Task<ListResultDto<VocabularyDto>> CreateBulkAsync(List<CreateVocabularyDto> input)
+        {
+            var entities = new List<Vocabulary>();
+            foreach (var entityDto in input)
+            {
+                var entity = ObjectMapper.Map<Vocabulary>(entityDto);
+                if (entityDto.StudySetIds != null)
+                {
+                    var studySets = await _studySetRepository.GetAllIncluding(s => s.VocabularyStudySets)
+                        .Where(s => entityDto.StudySetIds.Contains(s.Id))
+                        .ToListAsync();
+
+                    foreach (var studySet in studySets)
+                    {
+                        entity.AddStudySet(studySet);
+                    }
+                }
+                entities.Add(entity);
+            }
+            await _vocabularyRepository.InsertRangeAsync(entities);
+
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            return new ListResultDto<VocabularyDto>(
+                ObjectMapper.Map<List<VocabularyDto>>(entities));
         }
 
         public async Task<VocabularyDto> UpdateAsync(VocabularyDto input)

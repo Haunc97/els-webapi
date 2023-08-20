@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/create-vocabulary-dialog.component';
 import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-vocabulary-dialog.component';
 import { ViewVocabularyDialogComponent } from './view-vocabulary-dialog/view-vocabulary-dialog.component';
+import { CreateBulkVocabularyDialogComponent } from './create-bulk-vocabulary-dialog/create-bulk-vocabulary-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: FilterProperty<WordClassEnum> | null
@@ -53,6 +54,20 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
 
   createVocabulary(): void {
     this.showCreateOrEditVocabularyDialog();
+  }
+
+  createBulkVocabulary(): void {
+    let createBulkVocabularyDialog: BsModalRef;
+    createBulkVocabularyDialog = this._modalService.show(
+      CreateBulkVocabularyDialogComponent,
+      {
+        class: 'modal-lg',
+      }
+    );
+
+    createBulkVocabularyDialog.content.onSave.subscribe(() => {
+      this.refresh();
+    });
   }
 
   clearFilters(): void {
@@ -149,4 +164,5 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
       this.refresh();
     });
   }
+
 }

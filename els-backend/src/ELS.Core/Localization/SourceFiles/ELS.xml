@@ -130,5 +130,7 @@
 		<text name="SelectedItems" value="Selected Item(s)" />
 		<text name="EditStudySet" value="Edit study set" />
 		<text name="CreateNewStudySet" value="Create new study set" />
+		<text name="CreateBulk" value="Create bulk" />
+		<text name="CreateBulkVocabularies" value="Create bulk vocabularies" />
 	</texts>
 </localizationDictionary>

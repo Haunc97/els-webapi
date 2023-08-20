@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services.Dto;
 using ELS.Utils;
 using ELS.Vocabularies.Dtos;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ELS.Vocabularies
@@ -19,6 +20,8 @@ namespace ELS.Vocabularies
 
         #region Commands
         Task<VocabularyDto> CreateAsync(CreateVocabularyDto input);
+
+        Task<ListResultDto<VocabularyDto>> CreateBulkAsync(List<CreateVocabularyDto> input);
 
         Task<VocabularyDto> UpdateAsync(VocabularyDto input);
         #endregion

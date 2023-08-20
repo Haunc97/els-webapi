@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 import { CreateSentenceDialogComponent } from './create-sentence-dialog/create-sentence-dialog.component';
 import { EditSentenceDialogComponent } from './edit-sentence-dialog/edit-sentence-dialog.component';
 import { ViewSentenceDialogComponent } from './view-sentence-dialog/view-sentence-dialog.component';
+import { CreateBulkSentenceDialogComponent } from './create-bulk-sentence-dialog/create-bulk-sentence-dialog.component';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: FilterProperty<WordClassEnum> | null
@@ -51,6 +52,20 @@ export class SentencesComponent extends PagedListingComponentBase<VocabularyList
 
   createSentence(): void {
     this.showCreateOrEditSentenceDialog();
+  }
+
+  createBulkSentence(): void {
+    let createBulkSentenceDialog: BsModalRef;
+    createBulkSentenceDialog = this._modalService.show(
+      CreateBulkSentenceDialogComponent,
+      {
+        class: 'modal-lg',
+      }
+    );
+
+    createBulkSentenceDialog.content.onSave.subscribe(() => {
+      this.refresh();
+    });
   }
 
   clearFilters(): void {
