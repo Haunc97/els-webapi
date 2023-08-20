@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { StudySetTypeConfig2LabelMapping } from '@shared/AppConsts';
 import { StudySetTypeConfigEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
 import { CreateStudySetDto, DropdownItemDto, SelectedVocabularyDto, StudySetServiceProxy, VocabularySelectionDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-create-studyset-dialog',
@@ -37,7 +39,7 @@ implements OnInit {
     super(injector);
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
   }
 
   save(): void {

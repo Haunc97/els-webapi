@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
-using ELS.Authorization.Users;
 using ELS.StudySets.Dtos;
-using ELS.Users.Dto;
 using ELS.Vocabularies;
 using ELS.Vocabularies.Dtos;
 using ELS.VocabularyStudySets;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELS.StudySets
@@ -32,7 +30,7 @@ namespace ELS.StudySets
             _vocabularyStudySetRepository = vocabularyStudySetRepository;
         }
 
-
+        #region Commands
         public override async Task<StudySetDto> CreateAsync(CreateStudySetDto input)
         {
             CheckCreatePermission();
@@ -74,6 +72,22 @@ namespace ELS.StudySets
 
             return await GetAsync(input);
         }
+        #endregion
+
+        #region Queries
+        public async Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(GetStudySetSelectionRequestDto input)
+        {
+            var vocabularies = await Repository
+                .GetAll()
+                .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), v => v.Title.Contains(input.Keyword))
+                .OrderByDescending(v => v.CreationTime)
+                .Take(input.MaxResultCount)
+                .ToListAsync();
+
+            var dropdownItems = vocabularies.Select(x => new DropdownItemDto<int>(x.Title, x.Id)).ToList();
+            return new ListResultDto<DropdownItemDto<int>>(dropdownItems);
+        }
+        #endregion
 
         protected override IQueryable<StudySet> CreateFilteredQuery(PagedStudySetResultRequestDto input)
         {

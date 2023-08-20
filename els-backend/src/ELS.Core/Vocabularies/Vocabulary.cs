@@ -2,11 +2,13 @@
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.Timing;
+using ELS.StudySets;
 using ELS.VocabularyStudySets;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ELS.Vocabularies
 {
@@ -40,7 +42,7 @@ namespace ELS.Vocabularies
 
         public bool IsDeleted { get; set; }
 
-        public ICollection<VocabularyStudySet> VocabularyStudySets { get; set; }
+        public ICollection<VocabularyStudySet> VocabularyStudySets { get; private set; }
 
         public Vocabulary()
         {
@@ -57,6 +59,39 @@ namespace ELS.Vocabularies
             Phonetics = phonetics;
             Description = description;
             Example = example;
+        }
+
+        public void AddStudySet(StudySet studySet)
+        {
+            this.VocabularyStudySets ??= new List<VocabularyStudySet>();
+
+            var vocabularyStudySet = new VocabularyStudySet
+            {
+                StudySet = studySet
+            };
+
+            this.VocabularyStudySets.Add(vocabularyStudySet);
+        }
+
+        public void UpdateStudySets(IList<StudySet> studySets)
+        {
+            //Remove from removed vocabularies
+            foreach (var vocabularyStudySet in this.VocabularyStudySets)
+            {
+                if (studySets.All(studySet => vocabularyStudySet.StudySetId != studySet.Id))
+                {
+                    this.VocabularyStudySets.Remove(vocabularyStudySet);
+                }
+            }
+
+            //Add to added vocabularies
+            foreach (var studySet in studySets)
+            {
+                if (VocabularyStudySets.All(vocabularyStudySets => studySet.Id != vocabularyStudySets.StudySetId))
+                {
+                    this.AddStudySet(studySet);
+                }
+            }
         }
     }
 }

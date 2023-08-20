@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { WordClass2LabelMapping } from '@shared/AppConsts';
-import { FilterProperty, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { FilterProperty, StudySetDto, StudySetServiceProxy, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CarouselComponent, CarouselConfig } from 'ngx-bootstrap/carousel';
 import { StringHelper } from '../../../shared/helpers/AppHelpers'
 import { ActivatedRoute } from '@angular/router';
@@ -29,13 +29,16 @@ export class FlashcardsComponent
   vocabularies: VocabularyDto[] = [];
   curVocabulary: VocabularyDto | undefined;
   resultToggled: boolean = false;
+  studySet: StudySetDto | undefined;
 
   constructor(
     public _vocabularyService: VocabularyServiceProxy,
+    public _studySetService: StudySetServiceProxy,
     public route: ActivatedRoute) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadRandomVocabularies();
+    this.loadStudySet();
   }
 
   async loadRandomVocabularies() {
@@ -53,7 +56,7 @@ export class FlashcardsComponent
     if (vocabularyLevelTerm !== undefined)
       vocabularyLevelFilter = FilterProperty.toFilterProperty<VocabularyLevelEnum>(vocabularyLevelTerm, vocabularyLevelMethod);
 
-    let response = await firstValueFrom(this._vocabularyService.getRandom(
+    let response = await lastValueFrom(this._vocabularyService.getRandom(
       studySetId,
       wordClassFilter,
       vocabularyLevelFilter,
@@ -75,6 +78,15 @@ export class FlashcardsComponent
         id: vocabulary.id
       });
     });
+  }
+
+  async loadStudySet() {
+    let params = await firstValueFrom(this.route.queryParams); // Wait for the first value from the Observable
+    let studySetId = params['stdsetid'];
+    if (studySetId) {
+      let response = await lastValueFrom(this._studySetService.get(studySetId)); // Wait for the last value from the Observable
+      this.studySet = response;
+    }
   }
 
   toggleResult(): void {

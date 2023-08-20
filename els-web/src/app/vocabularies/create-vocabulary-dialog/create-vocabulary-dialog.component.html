@@ -171,22 +171,60 @@
             </tab>
             <tab [heading]="'StudySets' | localize" class="pt-3 px-2">
                 <div class="form-group row mb-0">
-                <!-- <ng-container *ngFor="let role of roles; let i = index">
-                    <div class="col-md-6">
-                    <div class="custom-control custom-checkbox">
-                        <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        [id]="'role_' + i"
-                        [checked]="isRoleChecked(role.normalizedName)"
-                        (change)="onRoleChange(role, $event)"
-                        />
-                        <label class="custom-control-label" [for]="'role_' + i">
-                        {{ role.name }}
-                        </label>
+                    <div class="form-group col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span 
+                                    class="input-group-text"
+                                    id="searchStdSet">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Search study set..."
+                                aria-label="Recipient's username"
+                                aria-describedby="searchStdSet"
+                                name="searchStdSet"
+                                id="searchStdSet"
+                                maxlength="32"
+                                [(ngModel)]="keyword"
+                                (ngModelChange)="searchChange()"
+                                #searchStdSetModel="ngModel"
+                                #searchStdSetEl
+                            />
+                        </div>
+                        <div
+                            class="search-result-container"
+                            style="height: 200px;
+                                    overflow-y: auto;"
+                            [busy]="loading">
+                            <ul class="list-group list-group-flush">
+                                <li 
+                                    *ngFor="let studySet of studySets; let i = index"
+                                    class="list-group-item"
+                                    style="cursor: pointer;"
+                                    (click)="toggleSelectStudySet(studySet)">
+                                    <i *ngIf="studySet.isSelected" class="fa fa-check text-success"></i>
+                                    {{studySet.text}}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+                    <div class="col-md-6 w-100"
+                        style="height: 253px;
+                                overflow-y: auto;">
+                        <div><strong>{{'SelectedItems' | localize}}</strong></div>
+                        <ul class="list-group list-group-flush">
+                            <li 
+                                *ngFor="let studySet of selectedStudySets; let i = index"
+                                style="cursor: pointer;"
+                                (click)="unselectStudySet(studySet)"
+                                class="list-group-item">{{studySet.title}}
+                            </li>
+                        </ul>
                     </div>
-                </ng-container> -->
                 </div>
             </tab>
         </tabset>

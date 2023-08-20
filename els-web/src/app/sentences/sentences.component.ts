@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { VocabularyLevel2LabelMapping, WordClass2LabelMapping } from '@shared/AppConsts';
+import { VocabularyLevel2LabelMapping, VocabularyLevelLabelClassMapping, WordClass2LabelMapping } from '@shared/AppConsts';
 import { FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
@@ -27,6 +27,7 @@ export class SentencesComponent extends PagedListingComponentBase<VocabularyList
 
   public WordClass2LabelMapping = WordClass2LabelMapping;
   public VocabularyLevel2LabelMapping = VocabularyLevel2LabelMapping;
+  public VocabularyLevelLabelClassMapping = VocabularyLevelLabelClassMapping;
   public WordClassEnum = WordClassEnum;
   public FilterMethodEnum = FilterMethodEnum;
 
@@ -104,7 +105,7 @@ export class SentencesComponent extends PagedListingComponentBase<VocabularyList
 
   protected delete(sentence: VocabularyListDto): void {
     abp.message.confirm(
-      this.l('VocabularyDeleteWarningMessage', sentence.term),
+      this.l('AreYouSureWantToDelete', `"${sentence.term}"`),
       undefined,
       (result: boolean) => {
         if (result) {

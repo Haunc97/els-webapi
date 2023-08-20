@@ -1,6 +1,8 @@
 ﻿using Abp.AutoMapper;
 using System;
 using Abp.Application.Services.Dto;
+using System.Collections.Generic;
+using ELS.StudySets.Dtos;
 
 namespace ELS.Vocabularies.Dtos
 {
@@ -23,5 +25,7 @@ namespace ELS.Vocabularies.Dtos
         public string Example { get; set; }
 
         public DateTime CreationTime { get; set; }
+
+        public List<StudySetDto> StudySets { get; set; }
     }
 }

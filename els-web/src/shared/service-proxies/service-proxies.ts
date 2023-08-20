@@ -1856,6 +1856,7 @@ export class VocabularyServiceProxy {
      * @return Success
      */
     create(body: CreateVocabularyDto | undefined): Observable<VocabularyDto> {
+        debugger;
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/Create";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2481,6 +2482,62 @@ export class StudySetServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = StudySetDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getSelection(
+        keyword: string | undefined,
+        maxResultCount: number | undefined): Observable<StudySetSelectionDto> {
+        let url_ = this.baseUrl + "/api/services/app/StudySet/GetSelection?";
+        if (keyword === null)
+            throw new Error("The parameter 'keyword' cannot be null.");
+        else if (keyword !== undefined)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSelection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSelection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StudySetSelectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StudySetSelectionDto>;
+        }));
+    }
+
+    protected processGetSelection(response: HttpResponseBase): Observable<StudySetSelectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VocabularySelectionDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -4489,6 +4546,7 @@ export class VocabularyDto implements IVocabularyDto {
     description: string;
     example: string;
     creationTime: moment.Moment;
+    studySets: StudySetDto[] | undefined;
 
     constructor(data?: IVocabularyDto) {
         if (data) {
@@ -4510,6 +4568,11 @@ export class VocabularyDto implements IVocabularyDto {
             this.description = _data["description"];
             this.example = _data["example"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            if (Array.isArray(_data["studySets"])) {
+                this.studySets = [] as any;
+                for (let item of _data["studySets"])
+                    this.studySets.push(StudySetDto.fromJS(item));
+            }
         }
     }
 
@@ -4531,6 +4594,11 @@ export class VocabularyDto implements IVocabularyDto {
         data["description"] = this.description;
         data["example"] = this.example;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        if (Array.isArray(this.studySets)) {
+            data["studySets"] = [];
+            for (let item of this.studySets)
+                data["studySets"].push(item.toJSON());
+        }
         return data;
     }
 
@@ -4552,6 +4620,7 @@ export interface IVocabularyDto {
     description: string;
     example: string;
     creationTime: moment.Moment;
+    studySets: StudySetDto[] | undefined;
 }
 
 export class VocabularyListDto implements IVocabularyListDto {
@@ -4777,6 +4846,56 @@ export class VocabularySelectionDto implements IVocabularySelectionDto {
 export interface IVocabularySelectionDto extends IListResultDto<DropdownItemDto<number>> {
 }
 
+export class StudySetSelectionDto implements IStudySetSelectionDto {
+    items: DropdownItemDto<number>[];
+
+    constructor(data?: IVocabularySelectionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                this.items.push(DropdownItemDto.fromJS<number>(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): VocabularySelectionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VocabularySelectionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+        data["items"] = [];
+        for (let item of this.items)
+            data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): VocabularySelectionDto {
+        const json = this.toJSON();
+        let result = new VocabularySelectionDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IStudySetSelectionDto extends IListResultDto<DropdownItemDto<number>> {
+}
+
 export class CreateVocabularyDto implements ICreateVocabularyDto {
     term: string;
     definition: string;
@@ -4785,6 +4904,7 @@ export class CreateVocabularyDto implements ICreateVocabularyDto {
     level: VocabularyLevelEnum;
     description: string;
     example: string;
+    studySetIds: number[] | undefined;
 
     constructor(data?: ICreateVocabularyDto) {
         if (data) {
@@ -4804,12 +4924,17 @@ export class CreateVocabularyDto implements ICreateVocabularyDto {
             this.level = _data["level"];
             this.description = _data["description"];
             this.example = _data["example"];
+            if (Array.isArray(_data["studySetIds"])) {
+                this.studySetIds = [] as any;
+                for (let item of _data["studySetIds"])
+                    this.studySetIds.push(item);
+            }
         }
     }
 
-    static fromJS(data: any): CreateUserDto {
+    static fromJS(data: any): CreateVocabularyDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateUserDto();
+        let result = new CreateVocabularyDto();
         result.init(data);
         return result;
     }
@@ -4823,6 +4948,11 @@ export class CreateVocabularyDto implements ICreateVocabularyDto {
         data["level"] = this.level;
         data["description"] = this.description;
         data["example"] = this.example;
+        if (Array.isArray(this.studySetIds)) {
+            data["studySetIds"] = [];
+            for (let item of this.studySetIds)
+                data["studySetIds"].push(item);
+        }
         return data;
     }
 
@@ -4842,6 +4972,7 @@ export interface ICreateVocabularyDto {
     level: VocabularyLevelEnum;
     description: string;
     example: string;
+    studySetIds: number[] | undefined;
 }
 
 export class SelectedVocabularyDto implements ISelectedVocabularyDto
@@ -5129,6 +5260,54 @@ export class FilterProperty<T> implements IFilterProperty<T>
         result.init(json);
         return result;
     }
+}
+
+export class SelectedStudySetDto implements ISelectedStudySetDto
+{
+    id: number;
+    title: string;
+
+    constructor(data?: ISelectedStudySetDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+        }
+    }
+
+    static fromJS(data: any): SelectedStudySetDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectedStudySetDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        return data;
+    }
+
+    clone(): SelectedStudySetDto {
+        const json = this.toJSON();
+        let result = new SelectedStudySetDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ISelectedStudySetDto {
+    id: number;
+    title: string;
 }
 
 export interface IFilterProperty<T> {

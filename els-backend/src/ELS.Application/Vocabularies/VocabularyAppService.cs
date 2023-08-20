@@ -1,11 +1,15 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
+using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using ELS.Authorization;
+using ELS.StudySets;
+using ELS.StudySets.Dtos;
 using ELS.Utils;
 using ELS.Vocabularies.Dtos;
+using ELS.VocabularyStudySets;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,10 +24,17 @@ namespace ELS.Vocabularies
     public class VocabularyAppService : ELSAppServiceBase, IVocabularyAppService
     {
         private readonly IRepository<Vocabulary> _vocabularyRepository;
+        private readonly IRepository<StudySet> _studySetRepository;
+        private readonly IRepository<VocabularyStudySet> _vocabularyStudySetRepository;
 
-        public VocabularyAppService(IRepository<Vocabulary> vocabularyRepository)
+        public VocabularyAppService(
+            IRepository<Vocabulary> vocabularyRepository,
+            IRepository<StudySet> studySetRepository,
+            IRepository<VocabularyStudySet> vocabularyStudySetRepository)
         {
             _vocabularyRepository = vocabularyRepository;
+            _studySetRepository = studySetRepository;
+            _vocabularyStudySetRepository = vocabularyStudySetRepository;
         }
 
         #region Commands
@@ -32,6 +43,18 @@ namespace ELS.Vocabularies
             //CheckCreatePermission();
 
             var entity = ObjectMapper.Map<Vocabulary>(input);
+
+            if (input.StudySetIds != null)
+            {
+                var studySets = await _studySetRepository.GetAllIncluding(s => s.VocabularyStudySets)
+                    .Where(s => input.StudySetIds.Contains(s.Id))
+                    .ToListAsync();
+
+                foreach ( var studySet in studySets)
+                {
+                    studySet.AddVocabulary(entity);
+                }
+            }
 
             await _vocabularyRepository.InsertAsync(entity);
 
@@ -44,9 +67,16 @@ namespace ELS.Vocabularies
         {
             //CheckUpdatePermission();
 
-            var vocabulary = await GetVocabularyByIdAsync(input.Id);
+            //var vocabulary = await GetVocabularyByIdAsync(input.Id);
+            var vocabulary = await _vocabularyRepository.GetAllIncluding(v => v.VocabularyStudySets)
+                .SingleOrDefaultAsync(v => v.Id == input.Id);
 
             ObjectMapper.Map(input, vocabulary);
+
+            var studySetIds = input.StudySets.Select(s => s.Id).ToList();
+            var studySets = await _studySetRepository.GetAllListAsync(x => studySetIds.Contains(x.Id));
+            
+            vocabulary.UpdateStudySets(studySets);
 
             await _vocabularyRepository.UpdateAsync(vocabulary);
 
@@ -83,7 +113,7 @@ namespace ELS.Vocabularies
         public async Task<VocabularyDto> GetAsync(EntityDto<int> input)
         {
             var entity = await GetVocabularyByIdAsync(input.Id);
-            return ObjectMapper.Map<VocabularyDto>(entity);
+            return MapToEntityDto(entity);
         }
 
         public async Task<ListResultDto<VocabularyDto>> GetRandomAsync(GetRandomVocabularyRequestDto input)
@@ -131,6 +161,20 @@ namespace ELS.Vocabularies
         protected Task<Vocabulary> GetVocabularyByIdAsync(int id)
         {
             return _vocabularyRepository.GetAsync(id);
+        }
+
+        protected VocabularyDto MapToEntityDto(Vocabulary vocabulary)
+        {
+            var vocabularyDto = ObjectMapper.Map<VocabularyDto>(vocabulary);
+
+            var studySets = _vocabularyStudySetRepository.GetAllIncluding(x => x.StudySet)
+                .Where(x => x.VocabularyId == vocabulary.Id)
+                .Select(x => x.StudySet)
+                .ToList();
+
+            vocabularyDto.StudySets = ObjectMapper.Map<List<StudySetDto>>(studySets);
+
+            return vocabularyDto;
         }
     }
 }

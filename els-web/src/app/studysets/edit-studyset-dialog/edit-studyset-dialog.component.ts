@@ -40,8 +40,6 @@ export class EditStudysetDialogComponent extends AppComponentBase
   ngOnInit(): void {
     this._studySetService.get(this.id).subscribe((result) => {
       this.stdSet = result;
-      this.stdSet.vocabularies?.forEach(vocabulary => {
-      });
     });
   }
 

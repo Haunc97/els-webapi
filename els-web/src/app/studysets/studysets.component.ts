@@ -1,11 +1,12 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { StudySetDto, StudySetDtoPagedResultDto, StudySetServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { finalize } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import { CreateStudysetDialogComponent } from './create-studyset-dialog/create-studyset-dialog.component';
 import { EditStudysetDialogComponent } from './edit-studyset-dialog/edit-studyset-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 
 class PagedStudySetsRequestDto extends PagedRequestDto {
   keyword: string | null;
@@ -16,17 +17,34 @@ class PagedStudySetsRequestDto extends PagedRequestDto {
   templateUrl: './studysets.component.html',
   animations: [appModuleAnimation()]
 })
-export class StudysetsComponent extends PagedListingComponentBase<StudySetDto> {
+export class StudysetsComponent extends PagedListingComponentBase<StudySetDto> implements OnInit {
   stdSets: StudySetDto[] = [];
   keyword = '';
   advancedFiltersVisible = false;
 
   constructor(
     injector: Injector,
+    private route: ActivatedRoute,
     private _studySetService: StudySetServiceProxy,
     private _modalService: BsModalService
   ) {
     super(injector);
+  }
+
+  ngOnInit() {
+    // let params = await firstValueFrom(this.route.queryParams); // Wait for the first value from the Observable
+    // if (params['search']) {
+    //   this.keyword = params['search'];
+    // }
+    // super.ngOnInit();
+
+    this.route.queryParams.subscribe((_params) => {
+      if (_params['search']) {
+        this.keyword = _params['search'];
+      }
+
+      super.ngOnInit();
+    })
   }
 
   clearFilters(): void {
@@ -71,7 +89,7 @@ export class StudysetsComponent extends PagedListingComponentBase<StudySetDto> {
 
   protected delete(stdSet: StudySetDto): void {
     abp.message.confirm(
-      this.l('StudySetDeleteWarningMessage', stdSet.title),
+      this.l('AreYouSureWantToDelete', stdSet.title),
       undefined,
       (result: boolean) => {
         if (result) {

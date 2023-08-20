@@ -1,10 +1,17 @@
 <div [@routerTransition]>
     <section class="content-header">
+        <div class="container-fluid">
+            <div *ngIf="studySet" class="h5">
+                <strong class="text-uppercase">{{'Study Set' | localize}}: </strong>
+                <a [routerLink]="['../studysets']" [queryParams]="{'search': studySet.title}" target="_blank">{{studySet.title}}</a>
+            </div>
+        </div>
+        
     </section>
     <section class="content px-2">
         <div class="container-fluid">
             <div class="d-flex justify-content-center">
-                <div style="width: 1000px">
+                <div style="width: 950px">
                     <carousel #cardCarousel [noWrap]="noWrapSlides" [showIndicators]="showIndicator" (activeSlideChange)="onSlideChange($event)">
                         <slide *ngFor="let slide of slides; let index=index">
                             <img [src]="slide.image" alt="image slide" style="display: block; width: 100%; opacity: 0.8;">

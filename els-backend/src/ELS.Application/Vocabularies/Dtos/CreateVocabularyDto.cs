@@ -18,5 +18,7 @@ namespace ELS.Vocabularies.Dtos
         public string Description { get; set; }
 
         public string Example { get; set; }
+
+        public int[] StudySetIds { get; set; }
     }
 }

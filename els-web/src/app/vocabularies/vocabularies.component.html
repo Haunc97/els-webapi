@@ -141,8 +141,16 @@
                             >
                                 <td><span (click)="viewVocabulary(vocabulary)" style="cursor: pointer;">{{ vocabulary.term }}</span></td>
                                 <td>{{ vocabulary.definition }}</td>
-                                <td>{{ WordClass2LabelMapping[vocabulary.classification] | localize }}</td>
-                                <td>{{ VocabularyLevel2LabelMapping[vocabulary.level] | localize }}</td>
+                                <td>
+                                    <span [class]="WordClassLabelClassMapping[vocabulary.classification]">
+                                        {{ WordClass2LabelMapping[vocabulary.classification] | localize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span [class]="VocabularyLevelLabelClassMapping[vocabulary.level]">
+                                        {{ VocabularyLevel2LabelMapping[vocabulary.level] | localize }}
+                                    </span>
+                                </td>
                                 <td>
                                     <button
                                             type="button"

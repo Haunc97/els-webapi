@@ -38,12 +38,33 @@ export const WordClass2LabelMapping: Record<WordClassEnum, string> = {
     [WordClassEnum.Sentence]: "Sentence"
 };
 
+export const WordClassLabelClassMapping: Record<WordClassEnum, string> = {
+    [WordClassEnum.Noun]: "badge badge-pill badge-primary",
+    [WordClassEnum.Verb]: "badge badge-pill badge-warning",
+    [WordClassEnum.Adjective]: "badge badge-pill badge-info",
+    [WordClassEnum.Adverb]: "badge badge-pill badge-success",
+    [WordClassEnum.PhrasalVerb]: "badge badge-pill badge-warning",
+    [WordClassEnum.Preposition]: "badge badge-pill badge-light",
+    [WordClassEnum.Conjunction]: "badge badge-pill badge-light",
+    [WordClassEnum.Pronouns]: "badge badge-pill badge-light",
+    [WordClassEnum.Exclamation]: "badge badge-pill badge-light",
+    [WordClassEnum.Idiom]: "badge badge-pill badge-light",
+    [WordClassEnum.Other]: "badge badge-pill badge-secondary",
+    [WordClassEnum.Sentence]: "badge badge-pill badge-light"
+};
+
 // optional: Record type annotation guaranties that 
 // all the values from the enum are presented in the mapping
 export const VocabularyLevel2LabelMapping: Record<VocabularyLevelEnum, string> = {
     [VocabularyLevelEnum.Easy]: "Easy",
     [VocabularyLevelEnum.Medium]: "Medium",
     [VocabularyLevelEnum.Hard]: "Hard"
+};
+
+export const VocabularyLevelLabelClassMapping: Record<VocabularyLevelEnum, string> = {
+    [VocabularyLevelEnum.Easy]: "badge badge-pill badge-success",
+    [VocabularyLevelEnum.Medium]: "badge badge-pill badge-warning",
+    [VocabularyLevelEnum.Hard]: "badge badge-pill badge-danger"
 };
 
 export const StudySetTypeConfig2LabelMapping: Record<StudySetTypeConfigEnum, string> = {
