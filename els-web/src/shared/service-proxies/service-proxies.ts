@@ -2083,10 +2083,10 @@ export class VocabularyServiceProxy {
     }
 
     getRandom(
-        studySetId: number | undefined,
-        classification: FilterProperty<WordClassEnum> | undefined,
-        level: FilterProperty<VocabularyLevelEnum> | undefined,
-        maxResultCount: number | undefined): Observable<VocabularyDtoListResultDto> {
+        studySetId: number | undefined = undefined,
+        classification: FilterProperty<WordClassEnum> | undefined = undefined,
+        level: FilterProperty<VocabularyLevelEnum> | undefined = undefined,
+        maxResultCount: number | undefined = undefined): Observable<VocabularyDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetRandom?";
         
         if (studySetId !== undefined)

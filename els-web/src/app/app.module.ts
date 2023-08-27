@@ -53,6 +53,7 @@ import { CreateStudysetDialogComponent } from './studysets/create-studyset-dialo
 import { EditStudysetDialogComponent } from './studysets/edit-studyset-dialog/edit-studyset-dialog.component';
 import { CreateBulkVocabularyDialogComponent } from './vocabularies/create-bulk-vocabulary-dialog/create-bulk-vocabulary-dialog.component';
 import { CreateBulkSentenceDialogComponent } from './sentences/create-bulk-sentence-dialog/create-bulk-sentence-dialog.component';
+import { QuizComponent } from './activities/quiz/quiz.component';
 
 @NgModule({
     declarations: [
@@ -96,7 +97,8 @@ import { CreateBulkSentenceDialogComponent } from './sentences/create-bulk-sente
         CreateStudysetDialogComponent,
         EditStudysetDialogComponent,
         CreateBulkVocabularyDialogComponent,
-        CreateBulkSentenceDialogComponent
+        CreateBulkSentenceDialogComponent,
+        QuizComponent
     ],
     imports: [
         CommonModule,

@@ -12,6 +12,7 @@ import { VocabulariesComponent } from './vocabularies/vocabularies.component';
 import { FlashcardsComponent } from './activities/flashcards/flashcards.component';
 import { SentencesComponent } from './sentences/sentences.component';
 import { StudysetsComponent } from './studysets/studysets.component';
+import { QuizComponent } from './activities/quiz/quiz.component';
 
 @NgModule({
     imports: [
@@ -29,7 +30,8 @@ import { StudysetsComponent } from './studysets/studysets.component';
                     { path: 'vocabularies', component: VocabulariesComponent, canActivate: [AppRouteGuard] },
                     { path: 'sentences', component: SentencesComponent, canActivate: [AppRouteGuard] },
                     { path: 'studysets', component: StudysetsComponent, canActivate: [AppRouteGuard] },
-                    { path: 'flashcards', component: FlashcardsComponent, canActivate: [AppRouteGuard] }
+                    { path: 'flashcards', component: FlashcardsComponent, canActivate: [AppRouteGuard] },
+                    { path: 'quiz', component: QuizComponent, canActivate: [AppRouteGuard] }
                 ]
             }
         ])

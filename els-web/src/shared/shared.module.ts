@@ -17,6 +17,7 @@ import { LayoutStoreService } from './layout/layout-store.service';
 
 import { BusyDirective } from './directives/busy.directive';
 import { EqualValidator } from './directives/equal-validator.directive';
+import { AutoFocusNextDirective } from './directives/auto-focus-next.directive';
 
 @NgModule({
     imports: [
@@ -31,6 +32,7 @@ import { EqualValidator } from './directives/equal-validator.directive';
         AbpModalFooterComponent,
         LocalizePipe,
         BusyDirective,
+        AutoFocusNextDirective,
         EqualValidator
     ],
     exports: [
@@ -40,6 +42,7 @@ import { EqualValidator } from './directives/equal-validator.directive';
         AbpModalFooterComponent,
         LocalizePipe,
         BusyDirective,
+        AutoFocusNextDirective,
         EqualValidator
     ]
 })

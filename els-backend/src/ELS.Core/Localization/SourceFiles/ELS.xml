@@ -132,5 +132,6 @@
 		<text name="CreateNewStudySet" value="Create new study set" />
 		<text name="CreateBulk" value="Create bulk" />
 		<text name="CreateBulkVocabularies" value="Create bulk vocabularies" />
+		<text name="CreateBulkSentences" value="Create bulk sentences" />
 	</texts>
 </localizationDictionary>

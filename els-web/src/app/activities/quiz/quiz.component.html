@@ -1,0 +1,101 @@
+<div [@routerTransition]>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <h1>{{ "Quiz" | localize }}</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content px-2">
+        <div class="container-fluid">
+            <div class="card">
+                <form 
+                    class="form-horizontal"
+                    autocomplete="off"
+                    #quickTestForm="ngForm"
+                    (ngSubmit)="submit()"
+                >
+                    <div class="card-body">
+                        <div class="modal-body">
+                            <div class="form-group" *ngFor="let question of questions; let i = index">
+                                <label class="col-form-label" for="currentPassword">
+                                    Q{{i + 1}}. {{ question.question }}
+                                    <i
+                                        class="fa fa-times-circle text-danger"
+                                        *ngIf="!question.isCorrect && question.isSubmitted">
+                                    </i>
+                                    <i
+                                        class="fa fa-check-circle text-success"
+                                        *ngIf="question.isCorrect && question.isSubmitted">
+                                    </i>
+                                </label>
+                                <div class="d-flex flex-wrap">
+                                    <ng-container *ngFor="let item of countWordsAndSpaces(question.answer); let j = index">
+                                        <input
+                                            *ngIf="item > 0"
+                                            type="text"
+                                            class="form-control mr-1"
+                                            name="{{i}}_{{j}}_response"
+                                            id="{{i}}_{{j}}_response"
+                                            [(ngModel)]="question.response[j]"
+                                            [attr.maxlength]="item"
+                                            [style.width]="getWidth(item) + 'px'"
+                                            autoFocusNext
+                                        />
+                                    </ng-container>
+                                </div>
+                                <div *ngIf="!question.isCorrect && question.isSubmitted" class="text-secondary">
+                                    <strong>{{"Answer" | localize}}: </strong> {{question.answer}}
+                                </div>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="isSubmitted">
+                            <div
+                                *ngIf="percentage > 70"
+                                class="alert alert-success"
+                                role="alert">
+                                <h4 class="alert-heading">Well done!</h4>
+                                <p>You answered <strong>{{correctCount}}</strong> out of <strong>{{questions.length}}</strong> questions correctly.</p>
+                                <p>You got <strong>{{percentage}}%</strong> of the questions right.</p>
+                            </div>
+                            <div
+                                *ngIf="percentage >= 50 && percentage <= 70"
+                                class="alert alert-warning"
+                                role="alert">
+                                <p>You answered <strong>{{correctCount}}</strong> out of <strong>{{questions.length}}</strong> questions correctly.</p>
+                                <p>You got <strong>{{percentage}}%</strong> of the questions right.</p>
+                            </div>
+                            <div
+                                *ngIf="percentage < 50"
+                                class="alert alert-danger"
+                                role="alert">
+                                <p>You answered <strong>{{correctCount}}</strong> out of <strong>{{questions.length}}</strong> questions correctly.</p>
+                                <p>You got <strong>{{percentage}}%</strong> of the questions right.</p>
+                            </div>
+                        </ng-container>
+                        
+                    </div>
+                    <div class="card-footer justify-content-between">
+                        <button type="submit" class="btn btn-primary"
+                            *ngIf="!isSubmitted"
+                            [disabled]="!quickTestForm.form.valid || saving">
+                            {{ "Submit" | localize }}
+                        </button>
+                        <button type="button" class="btn btn-primary mx-2"
+                            *ngIf="isSubmitted"
+                            (click)="retry()">
+                            {{ "Retry" | localize }}
+                        </button>
+                        <button type="button" class="btn btn-success"
+                            *ngIf="isSubmitted"
+                            (click)="nextQuiz()">
+                            {{ "Next" | localize }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
