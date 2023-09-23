@@ -14,7 +14,6 @@ import { ServiceProxyModule } from '@shared/service-proxies/service-proxy.module
 import { SharedModule } from '@shared/shared.module';
 import { CarouselModule } from 'ngx-bootstrap/carousel';
 import { HomeComponent } from '@app/home/home.component';
-import { AboutComponent } from '@app/about/about.component';
 // tenants
 import { TenantsComponent } from '@app/tenants/tenants.component';
 import { CreateTenantDialogComponent } from './tenants/create-tenant/create-tenant-dialog.component';
@@ -59,7 +58,6 @@ import { QuizComponent } from './activities/quiz/quiz.component';
     declarations: [
         AppComponent,
         HomeComponent,
-        AboutComponent,
         // tenants
         TenantsComponent,
         CreateTenantDialogComponent,

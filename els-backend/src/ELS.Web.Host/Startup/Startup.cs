@@ -20,6 +20,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System.IO;
+using ELS.Data;
+using ELS.EntityFrameworkCore.Data;
 
 namespace ELS.Web.Host.Startup
 {
@@ -40,6 +42,7 @@ namespace ELS.Web.Host.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IDataQuery, EfDataQuery>();
             //MVC
             services.AddControllersWithViews(
                 options => { options.Filters.Add(new AbpAutoValidateAntiforgeryTokenAttribute()); }

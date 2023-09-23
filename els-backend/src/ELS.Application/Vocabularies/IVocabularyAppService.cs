@@ -13,7 +13,9 @@ namespace ELS.Vocabularies
 
         Task<ListResultDto<VocabularyDto>> GetRandomAsync(GetRandomVocabularyRequestDto input);
 
-        Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(GetVocabularySelectionRequestDto input);
+        Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(SearchVocabularyRequestDto input);
+
+        Task<ListResultDto<VocabularyDto>> SearchAsync(SearchVocabularyRequestDto input);
 
         Task<VocabularyDto> GetAsync(EntityDto<int> input);
         #endregion

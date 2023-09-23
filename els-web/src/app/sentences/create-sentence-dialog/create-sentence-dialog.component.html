@@ -24,9 +24,15 @@
                             maxlength="512"
                             required
                             [(ngModel)]="sentence.term"
+                            (focusout)="searchSimilarVocabulary(sentence.term)"
                             #termModel="ngModel"
                             #termEl
                         ></textarea>
+                        <span *ngIf="similarVocabulariesFound.length > 0">
+                            <i class="fa fa-exclamation-circle mr-1 text-warning" aria-hidden="true"></i>
+                            <strong>{{"Similar found: " | localize}}</strong>
+                            <i>{{similarVocabulariesFoundString}}</i>
+                        </span>
                         <abp-validation-summary
                             [control]="termModel"
                             [controlEl]="termEl"

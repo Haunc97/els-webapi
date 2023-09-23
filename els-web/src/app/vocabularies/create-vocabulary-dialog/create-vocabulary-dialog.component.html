@@ -22,11 +22,18 @@
                             name="term"
                             id="term"
                             required
-                            maxlength="32"
+                            maxlength="128"
                             [(ngModel)]="vocabulary.term"
+                            (focusout)="searchSimilarVocabulary(vocabulary.term)"
                             #termModel="ngModel"
                             #termEl
                         />
+                        <span *ngIf="similarVocabulariesFound.length > 0">
+                            <i class="fa fa-exclamation-circle mr-1 text-warning" aria-hidden="true"></i>
+                            <strong>{{"Similar found: " | localize}}</strong>
+                            <i>{{similarVocabulariesFoundString}}</i>
+                        </span>
+
                         <abp-validation-summary
                             [control]="termModel"
                             [controlEl]="termEl"
@@ -44,7 +51,7 @@
                             name="def"
                             id="def"
                             required
-                            maxlength="32"
+                            maxlength="128"
                             [(ngModel)]="vocabulary.definition"
                             #defModel="ngModel"
                             #defEl

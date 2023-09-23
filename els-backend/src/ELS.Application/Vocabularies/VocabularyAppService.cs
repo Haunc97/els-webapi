@@ -1,11 +1,11 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
-using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using ELS.Authorization;
+using ELS.Data;
 using ELS.StudySets;
 using ELS.StudySets.Dtos;
 using ELS.Utils;
@@ -14,25 +14,32 @@ using ELS.VocabularyStudySets;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ELS.Vocabularies
 {
     [AbpAuthorize(PermissionNames.Pages_Vocabularies)]
     public class VocabularyAppService : ELSAppServiceBase, IVocabularyAppService
     {
+        private readonly IDataQuery _dataQuery;
         private readonly IRepository<Vocabulary> _vocabularyRepository;
         private readonly IRepository<StudySet> _studySetRepository;
         private readonly IRepository<VocabularyStudySet> _vocabularyStudySetRepository;
 
         public VocabularyAppService(
+            IDataQuery dataQuery,
             IRepository<Vocabulary> vocabularyRepository,
             IRepository<StudySet> studySetRepository,
             IRepository<VocabularyStudySet> vocabularyStudySetRepository)
         {
+            _dataQuery = dataQuery;
             _vocabularyRepository = vocabularyRepository;
             _studySetRepository = studySetRepository;
             _vocabularyStudySetRepository = vocabularyStudySetRepository;
@@ -157,7 +164,7 @@ namespace ELS.Vocabularies
             return new ListResultDto<VocabularyDto>(ObjectMapper.Map<List<VocabularyDto>>(vocabularies));
         }
 
-        public async Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(GetVocabularySelectionRequestDto input)
+        public async Task<ListResultDto<DropdownItemDto<int>>> GetSelectionAsync(SearchVocabularyRequestDto input)
         {
             var vocabularies = await _vocabularyRepository
                 .GetAll()
@@ -168,6 +175,77 @@ namespace ELS.Vocabularies
 
             var dropdownItems = vocabularies.Select(x => new DropdownItemDto<int>(x.Term, x.Id)).ToList();
             return new ListResultDto<DropdownItemDto<int>>(dropdownItems);
+        }
+
+        [HttpGet]
+        public async Task<ListResultDto<VocabularyDto>> SearchAsync(SearchVocabularyRequestDto input)
+        {
+            var sql = $@"
+                      SELECT TOP (@resultCount)
+	                    [Id],
+	                    [Term],
+	                    [Definition],
+	                    [Classification],
+	                    [Phonetics],
+	                    [Level],
+	                    [Description],
+	                    [Example]
+                    FROM 
+                    (
+	                    SELECT *, RANK() OVER (ORDER BY KEY_TBL.RANK DESC) AS Rank1
+	                    FROM dbo.AppVocabularies
+	                    INNER JOIN FREETEXTTABLE(dbo.AppVocabularies, Term, @keyword) AS KEY_TBL
+	                    ON dbo.AppVocabularies.Id = KEY_TBL.[KEY]
+	
+                    ) cte
+                    ORDER BY Rank1    
+            ";
+
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter
+                {
+                    ParameterName = "@keyword",
+                    Value = input.Keyword,
+                    DbType = DbType.String,
+                    Direction = ParameterDirection.Input
+                },
+                new SqlParameter
+                {
+                    ParameterName = "@resultCount",
+                    Value = input.MaxResultCount,
+                    DbType = DbType.Int64,
+                    Direction = ParameterDirection.Input
+                }
+            };
+
+            Func<DbDataReader, IEnumerable<VocabularyDto>> mapping = (reader) =>
+            {
+                var vocabularies = new List<VocabularyDto>();
+
+                while (reader.Read())
+                {
+                    var vocabulary = new VocabularyDto()
+                    {
+                        Id = (int)reader[0],
+                        Term = reader[1].ToString(),
+                        Definition = reader[2].ToString(),
+                        Classification = (WordClassType)reader[3],
+                        Phonetics = reader[4]?.ToString(),
+                        Level = (VocabularyLevelType)reader[5],
+                        Description = reader[6]?.ToString(),
+                        Example = reader[7]?.ToString(),
+                    };
+
+                    vocabularies.Add(vocabulary);
+                }
+
+                return vocabularies;
+            };
+
+            var result = _dataQuery.GetDataBySql(sql, mapping, parameters.ToArray());
+
+            return new ListResultDto<VocabularyDto>(result.ToList());
         }
         #endregion
 

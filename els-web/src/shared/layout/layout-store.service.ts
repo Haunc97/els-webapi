@@ -7,7 +7,7 @@ import { LayoutConfig } from './layout-config';
 export class LayoutStoreService {
   public readonly config$: Observable<LayoutConfig>;
   private readonly initialLayoutConfig: LayoutConfig = {
-    sidebarExpanded: true
+    sidebarExpanded: false
   };
   private configSource: BehaviorSubject<LayoutConfig>;
 

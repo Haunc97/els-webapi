@@ -7,6 +7,7 @@ using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using ELS.Data;
 using ELS.StudySets.Dtos;
 using ELS.Vocabularies;
 using ELS.Vocabularies.Dtos;

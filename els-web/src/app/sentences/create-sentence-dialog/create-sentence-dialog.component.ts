@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core
 import { VocabularyLevel2LabelMapping, WordClass2LabelMapping } from '@shared/AppConsts';
 import { VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
-import { CreateVocabularyDto, DropdownItemDto, SelectedStudySetDto, StudySetSelectionDto, StudySetServiceProxy, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CreateVocabularyDto, DropdownItemDto, SelectedStudySetDto, StudySetSelectionDto, StudySetServiceProxy, VocabularyDto, VocabularyDtoListResultDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
@@ -15,6 +15,7 @@ export class CreateSentenceDialogComponent extends AppComponentBase
   sentence = new CreateVocabularyDto();
   studySets: DropdownItemDto<number>[] = [];
   selectedStudySets: SelectedStudySetDto[] = [];
+  similarVocabulariesFound: VocabularyDto[] = [];
   keyword = '';
   loading = false;
 
@@ -39,6 +40,20 @@ export class CreateSentenceDialogComponent extends AppComponentBase
   ngOnInit(): void {
     //set default
     this.sentence.level = VocabularyLevelEnum.Easy;
+  }
+
+  searchSimilarVocabulary(term: string): void {
+    this.similarVocabulariesFound = [];
+    if (term.length >= 3) {
+      this._vocabularyService.search(term, 3).subscribe((result: VocabularyDtoListResultDto) => {
+        if (result?.items?.length > 0)
+          this.similarVocabulariesFound = result.items;
+      });
+    }
+  }
+
+  get similarVocabulariesFoundString(): string {
+    return this.similarVocabulariesFound.map(voc => voc.term).join('; ');
   }
 
   toggleSelectStudySet(
