@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System;
 
-namespace ELS.Utils
+namespace ELS.Common
 {
     public class FilterExpression
     {

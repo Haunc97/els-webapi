@@ -1,12 +1,13 @@
-﻿using Abp.Application.Services.Dto;
-using ELS.Utils;
+﻿using Abp.Application.Services;
+using Abp.Application.Services.Dto;
+using ELS.Common.Dto;
 using ELS.Vocabularies.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ELS.Vocabularies
 {
-    public interface IVocabularyAppService
+    public interface IVocabularyAppService : IApplicationService
     {
         #region Queries
         Task<PagedResultDto<VocabularyListDto>> GetAllAsync(PagedVocabularyResultRequestDto input);
@@ -27,18 +28,6 @@ namespace ELS.Vocabularies
 
         Task<VocabularyDto> UpdateAsync(VocabularyDto input);
         #endregion
-    }
-
-    public class DropdownItemDto<TPrimaryKey>
-    {
-        public string Text { get; set; }
-        public TPrimaryKey Value { get; set; }
-
-        public DropdownItemDto(string text, TPrimaryKey value)
-        {
-            Text = text;
-            Value = value;
-        }
     }
 
     public class GetVocabularySelectionRequestDto : LimitedResultRequestDto

@@ -6,6 +6,8 @@ using ELS.MultiTenancy;
 using ELS.Vocabularies;
 using ELS.StudySets;
 using ELS.VocabularyStudySets;
+using ELS.Quizzes;
+using ELS.VocabularyQuizzes;
 
 namespace ELS.EntityFrameworkCore
 {
@@ -15,17 +17,13 @@ namespace ELS.EntityFrameworkCore
         public DbSet<Vocabulary> Vocabularies { get; set; }
         public DbSet<StudySet> StudySets { get; set; }
         public DbSet<VocabularyStudySet> VocabularyStudySets { get; set; }
+        public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<VocabularyQuiz> VocabularyQuizzes { get; set; }
 
 
         public ELSDbContext(DbContextOptions<ELSDbContext> options)
             : base(options)
         {
         }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<VocabularyStudySet>()
-        //        .HasKey(v => new { v.StudySetId, v.VocabularyId });
-        //}
     }
 }

@@ -8,7 +8,6 @@ using ELS.Authorization;
 using ELS.Data;
 using ELS.StudySets;
 using ELS.StudySets.Dtos;
-using ELS.Utils;
 using ELS.Vocabularies.Dtos;
 using ELS.VocabularyStudySets;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +21,8 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ELS.Common;
+using ELS.Common.Dto;
 
 namespace ELS.Vocabularies
 {

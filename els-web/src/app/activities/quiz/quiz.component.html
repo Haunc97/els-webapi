@@ -39,6 +39,7 @@
                                             class="form-control mr-1"
                                             name="{{i}}_{{j}}_response"
                                             id="{{i}}_{{j}}_response"
+                                            [disabled]="isSubmitted"
                                             [(ngModel)]="question.response[j]"
                                             [attr.maxlength]="item"
                                             [style.width]="getWidth(item) + 'px'"

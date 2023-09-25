@@ -2716,6 +2716,74 @@ export class StudySetServiceProxy {
     }
 }
 
+@Injectable()
+export class QuizServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateQuizDto | undefined): Observable<QuizDto> {
+        let url_ = this.baseUrl + "/api/services/app/Quiz/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<QuizDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<QuizDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<QuizDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = QuizDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export class ApplicationInfoDto implements IApplicationInfoDto {
     version: string | undefined;
     releaseDate: moment.Moment;
@@ -5330,6 +5398,176 @@ export interface ICreateStudySetDto {
     wordTypeConfig: StudySetTypeConfigEnum | undefined;
     levelConfig: VocabularyLevelEnum | undefined;
     vocabularyIds: number[] | undefined;
+}
+
+export class CreateQuizDto implements ICreateQuizDto {
+    title: string | undefined;
+    totalCount: number;
+    correctCount: number;
+    percentage: number;
+    createVocabularyQuizzes: CreateVocabularyQuizDto[];
+
+    constructor(data?: ICreateQuizDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.totalCount = _data["totalCount"];
+            this.correctCount = _data["correctCount"];
+            this.percentage = _data["percentage"];
+            if (Array.isArray(_data["createVocabularyQuizzes"])) {
+                this.createVocabularyQuizzes = [] as any;
+                for (let item of _data["createVocabularyQuizzes"])
+                    this.createVocabularyQuizzes.push(CreateVocabularyQuizDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateQuizDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateQuizDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["totalCount"] = this.totalCount;
+        data["correctCount"] = this.correctCount;
+        data["percentage"] = this.percentage;
+        if (Array.isArray(this.createVocabularyQuizzes)) {
+            data["createVocabularyQuizzes"] = [];
+            for (let item of this.createVocabularyQuizzes)
+                data["createVocabularyQuizzes"].push(item.toJSON());
+        }
+            
+        return data;
+    }
+
+    clone(): CreateQuizDto {
+        const json = this.toJSON();
+        let result = new CreateQuizDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateQuizDto {
+    title: string | undefined;
+    totalCount: number;
+    correctCount: number;
+    percentage: number;
+    createVocabularyQuizzes: CreateVocabularyQuizDto[];
+}
+
+export class CreateVocabularyQuizDto implements ICreateVocabularyQuizDto {
+    vocabularyId: number;
+    answer: string | undefined;
+    isCorrect: boolean;
+
+    constructor(data?: ICreateVocabularyQuizDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.vocabularyId = _data["vocabularyId"];
+            this.answer = _data["answer"];
+            this.isCorrect = _data["isCorrect"];
+        }
+    }
+
+    static fromJS(data: any): CreateVocabularyQuizDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateVocabularyQuizDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["vocabularyId"] = this.vocabularyId;
+        data["answer"] = this.answer;
+        data["isCorrect"] = this.isCorrect;
+        return data;
+    }
+
+    clone(): CreateVocabularyQuizDto {
+        const json = this.toJSON();
+        let result = new CreateVocabularyQuizDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateVocabularyQuizDto {
+    vocabularyId: number;
+    answer: string | undefined;
+    isCorrect: boolean;
+}
+
+export class QuizDto implements IQuizDto {
+    title: string | undefined;
+    completionTime: moment.Moment;
+    creationTime: moment.Moment;
+
+    // constructor(data?: IQuizDto) {
+    //     if (data) {
+    //         for (var property in data) {
+    //             if (data.hasOwnProperty(property))
+    //                 (<any>this)[property] = (<any>data)[property];
+    //         }
+    //     }
+    // }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.completionTime = _data["completionTime"] ? moment(_data["completionTime"].toString()) : <any>undefined;
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): QuizDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new QuizDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["completionTime"] = this.completionTime.toISOString();
+        data["creationTime"] = this.creationTime.toISOString();
+        return data;
+    }
+
+    clone(): QuizDto {
+        const json = this.toJSON();
+        let result = new QuizDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IQuizDto {
+    title: string | undefined;
+    completionTime: moment.Moment;
+    creationTime: moment.Moment;
 }
 
 export class FilterProperty<T> implements IFilterProperty<T>

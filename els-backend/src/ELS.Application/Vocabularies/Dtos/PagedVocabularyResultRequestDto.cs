@@ -1,5 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
-using ELS.Utils;
+using ELS.Common;
 
 namespace ELS.Vocabularies.Dtos
 {

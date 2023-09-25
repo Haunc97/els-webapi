@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
+import { WordClass2LabelMapping } from '@shared/AppConsts';
 import { WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
-import { VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppComponentBase } from '@shared/app-component-base';
+import { CreateQuizDto, CreateVocabularyQuizDto, ICreateQuizDto, QuizServiceProxy, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 export class QuestionDto {
   question: string;
   options: OptionItemDto[] | undefined;
@@ -12,10 +14,17 @@ export class QuestionDto {
   isSubmitted: boolean;
 }
 export class VocabularyQuestionDto extends QuestionDto {
-
+  vocabularyId: number;
   constructor(vocabulary: VocabularyDto) {
     super();
-    super.question = vocabulary.definition;
+    this.vocabularyId = vocabulary.id;
+
+    let question = vocabulary.definition;
+    if (vocabulary.classification !== WordClassEnum.Other
+      && vocabulary.classification !== WordClassEnum.Sentence)
+      question += ` (${WordClass2LabelMapping[vocabulary.classification]})`;
+
+    super.question = question;
     super.answer = vocabulary.term;
     super.isCorrect = false;
     super.isSubmitted = false;
@@ -47,7 +56,7 @@ export class OptionItemDto {
   styleUrls: ['./quiz.component.css'],
   animations: [appModuleAnimation()]
 })
-export class QuizComponent implements OnInit {
+export class QuizComponent extends AppComponentBase implements OnInit {
 
   saving = false;
   isSubmitted = false;
@@ -56,7 +65,11 @@ export class QuizComponent implements OnInit {
   correctCount = 0;
   percentage = 0;
 
-  constructor(public _vocabularyService: VocabularyServiceProxy) {
+  constructor(
+    injector: Injector,
+    public _vocabularyService: VocabularyServiceProxy,
+    public _quizService: QuizServiceProxy) {
+    super(injector);
 
   }
 
@@ -148,6 +161,7 @@ export class QuizComponent implements OnInit {
 
   submit(): void {
     this.isSubmitted = true;
+
     this.questions.forEach(question => {
       let response = question.response.filter(x => x).join(" ");
       question.isCorrect = response.toLowerCase() === question.answer.toLowerCase();
@@ -155,6 +169,32 @@ export class QuizComponent implements OnInit {
     });
     this.correctCount = this.questions.filter(x => x.isCorrect).length;
     this.percentage = this.correctCount / this.questions.length * 100;
+
+    this.saveQuiz();
+  }
+
+  saveQuiz(): void {
+    let model = new CreateQuizDto({
+      title: undefined,
+      totalCount: this.questions.length,
+      correctCount: this.correctCount,
+      percentage: this.percentage,
+      createVocabularyQuizzes: []
+    });
+
+    this.questions.forEach(qn => {
+      let createVocabularyQuiz = new CreateVocabularyQuizDto({
+        vocabularyId: qn.vocabularyId,
+        answer: qn.response.filter(x => x).join(" "),
+        isCorrect: qn.isCorrect
+      });
+      
+      model.createVocabularyQuizzes.push(createVocabularyQuiz);
+    });
+
+    this._quizService.create(model).subscribe((_data) => {
+      abp.notify.success(this.l('SavedSuccessfully'));
+    });
   }
 
   onDigitInput(event) {
@@ -163,7 +203,7 @@ export class QuizComponent implements OnInit {
     if (event.code !== 'Backspace')
       if (event.target.value.length >= event.target.maxLength)
         element = event.srcElement.nextElementSibling;
-      
+
     if (event.code === 'Backspace') {
 
     }
