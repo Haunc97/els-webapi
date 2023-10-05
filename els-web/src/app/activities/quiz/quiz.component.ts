@@ -111,12 +111,8 @@ export class QuizComponent extends AppComponentBase implements OnInit {
 
     // Loop through each character in the input string
     for (let i = 0; i < input.length; i++) {
-      // If the character is a whitespace, push -1 to the output array
-      if (input[i] === " ") {
-
-      }
       // If the character is not a whitespace and the previous character is either a whitespace or undefined, push the length of the current word to the output array
-      else if (input[i - 1] === " " || input[i - 1] === undefined) {
+      if (input[i - 1] === " " || input[i - 1] === undefined) {
         // Find the index of the next whitespace or the end of the string
         let j = i + 1;
         while (j < input.length && input[j] !== " ") {

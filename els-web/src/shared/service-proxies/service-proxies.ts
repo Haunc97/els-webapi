@@ -14,7 +14,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import * as moment from 'moment';
-import { FilterMethodEnum, StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { DateRangeTypeEnum, FilterMethodEnum, StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
@@ -2134,6 +2134,113 @@ export class VocabularyServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = VocabularyDtoListResultDto.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getLeastCorrect(
+        maxResultCount: number | undefined = undefined): Observable<LeastCorrectVocabularyStatisticDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetLeastCorrect?";
+
+        if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLeastCorrect(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLeastCorrect(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LeastCorrectVocabularyStatisticDtoListResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LeastCorrectVocabularyStatisticDtoListResultDto>;
+        }));
+    }
+
+    protected processGetLeastCorrect(response: HttpResponseBase): Observable<LeastCorrectVocabularyStatisticDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LeastCorrectVocabularyStatisticDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    countVocabularies(
+        dateRange: DateRangeTypeEnum | undefined,
+        classification: FilterProperty<WordClassEnum> | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Vocabulary/CountVocabularies?";
+
+        if (dateRange != undefined)
+            url_ += "RangeType=" + encodeURIComponent("" + dateRange) + "&";
+        if (classification?.term !== undefined)
+            url_ += "Classification.Term=" + encodeURIComponent("" + (classification.term !== undefined ? classification.term : "")) + "&" + "Classification.Method=" + encodeURIComponent('' + classification.method) + "&";
+            
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCountVocabularies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCountVocabularies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCountVocabularies(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(resultData200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -4921,6 +5028,58 @@ export interface IVocabularyDtoListResultDto extends IListResultDto<VocabularyDt
 {
 }
 
+export class LeastCorrectVocabularyStatisticDtoListResultDto implements ILeastCorrectVocabularyStatisticDtoListResultDto
+{
+    items: LeastCorrectVocabularyListStatisticDto[] | undefined;
+
+    constructor(data?: ILeastCorrectVocabularyStatisticDtoListResultDto) {
+        if (data) {
+        for (var property in data) {
+            if (data.hasOwnProperty(property))
+            (<any>this)[property] = (<any>data)[property];
+        }
+        }
+    }
+    
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                this.items.push(LeastCorrectVocabularyListStatisticDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): LeastCorrectVocabularyStatisticDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LeastCorrectVocabularyStatisticDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+        data["items"] = [];
+        for (let item of this.items)
+            data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): LeastCorrectVocabularyStatisticDtoListResultDto {
+        const json = this.toJSON();
+        let result = new LeastCorrectVocabularyStatisticDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+export interface ILeastCorrectVocabularyStatisticDtoListResultDto extends IListResultDto<LeastCorrectVocabularyListStatisticDto>
+{
+}
+
 export class VocabularyDtoPagedResultDto implements IVocabularyDtoPagedResultDto {
     items: VocabularyListDto[] | undefined;
     totalCount: number;
@@ -5023,6 +5182,69 @@ export class VocabularySelectionDto implements IVocabularySelectionDto {
     }
 }
 export interface IVocabularySelectionDto extends IListResultDto<DropdownItemDto<number>> {
+}
+
+export class LeastCorrectVocabularyListStatisticDto implements ILeastCorrectVocabularyListStatisticDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    percentage: number;
+    answerCount: number;
+
+    constructor(data?: ILeastCorrectVocabularyListStatisticDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.term = _data["term"];
+            this.definition = _data["definition"];
+            this.classification = _data["classification"];
+            this.percentage = _data["percentage"];
+            this.answerCount = _data["answerCount"];
+        }
+    }
+
+    static fromJS(data: any): LeastCorrectVocabularyListStatisticDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LeastCorrectVocabularyListStatisticDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["term"] = this.term;
+        data["definition"] = this.definition;
+        data["classification"] = this.classification;
+        data["percentage"] = this.percentage;
+        data["answerCount"] = this.answerCount;
+        return data;
+    }
+
+    clone(): LeastCorrectVocabularyListStatisticDto {
+        const json = this.toJSON();
+        let result = new LeastCorrectVocabularyListStatisticDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILeastCorrectVocabularyListStatisticDto {
+    id: number;
+    term: string;
+    definition: string;
+    classification: WordClassEnum;
+    percentage: number;
+    answerCount: number;
 }
 
 export class StudySetSelectionDto implements IStudySetSelectionDto {

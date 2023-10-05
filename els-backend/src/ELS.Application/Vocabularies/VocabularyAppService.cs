@@ -248,7 +248,113 @@ namespace ELS.Vocabularies
 
             return new ListResultDto<VocabularyDto>(result.ToList());
         }
+
+        public async Task<ListResultDto<LeastCorrectVocabularyListStatisticDto>> GetLeastCorrectAsync(LimitedResultRequestDto input)
+        {
+            var sql = $@"
+                        SELECT TOP (@resultCount)
+	                        vo.[Id],
+	                        vo.[Term],
+	                        vo.[Definition],
+	                        vo.[Classification],
+	                        CAST(t2.[Count]/CONVERT(DECIMAL(4,2), t1.[Count]) AS DECIMAL(4,2)) AS [Percentage],
+                            t1.[Count]
+
+                        FROM Appvocabularies vo
+
+                        OUTER APPLY
+                        (
+	                        SELECT COUNT([QuizId]) AS [Count]
+	                        FROM AppvocabularyQuizzes
+	                        WHERE [VocabularyId] = vo.[Id]
+                        ) t1
+
+                        OUTER APPLY
+                        (
+	                        SELECT COUNT([QuizId]) AS [Count]
+	                        FROM AppvocabularyQuizzes
+	                        WHERE [VocabularyId] = vo.[Id]
+			                        AND [IsCorrect] = 0
+                        ) t2
+
+                        WHERE t1.[Count] > 0
+                        ORDER BY [Percentage] DESC, t1.[Count] DESC 
+            ";
+
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter
+                {
+                    ParameterName = "@resultCount",
+                    Value = input.MaxResultCount,
+                    DbType = DbType.Int64,
+                    Direction = ParameterDirection.Input
+                }
+            };
+
+            Func<DbDataReader, List<LeastCorrectVocabularyListStatisticDto>> mapping = (reader) =>
+            {
+                var vocabularies = new List<LeastCorrectVocabularyListStatisticDto>();
+
+                while (reader.Read())
+                {
+                    var vocabulary = new LeastCorrectVocabularyListStatisticDto()
+                    {
+                        Id = (int)reader[0],
+                        Term = reader[1].ToString(),
+                        Definition = reader[2].ToString(),
+                        Classification = (WordClassType)reader[3],
+                        Percentage = (decimal)reader[4],
+                        AnswerCount = (int)reader[5]
+                    };
+
+                    vocabularies.Add(vocabulary);
+                }
+
+                return vocabularies;
+            };
+
+            var result = _dataQuery.GetDataBySql(sql, mapping, parameters.ToArray());
+            return new ListResultDto<LeastCorrectVocabularyListStatisticDto>(result);
+        }
+
+        [HttpGet]
+        public async Task<int> CountVocabulariesAsync(DateRangeType? rangeType, FilterProperty<WordClassType>? classification)
+        {
+            var dateRange = GetDateRange(rangeType);
+
+            var result = await _vocabularyRepository
+                .GetAll()
+                .WhereIf(dateRange.Item1.HasValue, v => v.CreationTime.Date >= dateRange.Item1.Value)
+                .WhereIf(dateRange.Item2.HasValue, v => v.CreationTime.Date <= dateRange.Item2.Value)
+                .WhereIf(classification != null, GetFilter(classification, nameof(Vocabulary.Classification)))
+                .CountAsync();
+
+            return result;
+        }
         #endregion
+
+        private Tuple<DateTime?, DateTime?> GetDateRange(DateRangeType? rangeType)
+        {
+            DateTime? dateFrom = null;
+            DateTime? dateTo = null;
+            switch (rangeType)
+            {
+                case DateRangeType.ThisWeek:
+                    dateFrom = DateTime.Now.StartOfWeek(DayOfWeek.Monday);
+                    dateTo = dateFrom.Value.AddDays(6);
+                    break;
+                case DateRangeType.LastWeek:
+                    break;
+                case DateRangeType.ThisMonth:
+                    break;
+                case DateRangeType.LastMonth:
+                    break;
+                default:
+                    break;
+            }
+            return new Tuple<DateTime?, DateTime?> (dateFrom, dateTo);
+        }
 
         private Expression<Func<Vocabulary, bool>> GetFilter<T>(
             FilterProperty<T> filter,

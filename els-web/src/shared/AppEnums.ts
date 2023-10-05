@@ -39,3 +39,10 @@ export enum FilterMethodEnum {
     Contain = 30,
     NotContain = 40
 }
+
+export enum DateRangeTypeEnum {
+    ThisWeek = 1,
+    LastWeek = 2,
+    ThisMonth = 1,
+    LastMonth = 2
+}
