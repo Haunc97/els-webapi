@@ -1,9 +1,11 @@
 import { Component, Injector, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { WordClass2LabelMapping } from '@shared/AppConsts';
 import { WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/app-component-base';
-import { CreateQuizDto, CreateVocabularyQuizDto, ICreateQuizDto, QuizServiceProxy, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CreateQuizDto, CreateVocabularyQuizDto, FilterProperty, ICreateQuizDto, QuizServiceProxy, VocabularyDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
+import { firstValueFrom } from 'rxjs';
 export class QuestionDto {
   question: string;
   options: OptionItemDto[] | undefined;
@@ -15,9 +17,11 @@ export class QuestionDto {
 }
 export class VocabularyQuestionDto extends QuestionDto {
   vocabularyId: number;
+  isSentence: boolean;
   constructor(vocabulary: VocabularyDto) {
     super();
     this.vocabularyId = vocabulary.id;
+    this.isSentence = vocabulary.classification === WordClassEnum.Sentence;
 
     let question = vocabulary.definition;
     if (vocabulary.classification !== WordClassEnum.Other
@@ -28,12 +32,13 @@ export class VocabularyQuestionDto extends QuestionDto {
     super.answer = vocabulary.term;
     super.isCorrect = false;
     super.isSubmitted = false;
-    if (vocabulary.classification === WordClassEnum.Sentence) {
-      super.type = QuestionType.Text;
-    }
-    else {
-      super.type = QuestionType.SingleChoice;
-    }
+    
+    // if (vocabulary.classification === WordClassEnum.Sentence) {
+    //   super.type = QuestionType.Text;
+    // }
+    // else {
+    //   super.type = QuestionType.SingleChoice;
+    // }
   }
 }
 export enum QuestionType {
@@ -68,7 +73,8 @@ export class QuizComponent extends AppComponentBase implements OnInit {
   constructor(
     injector: Injector,
     public _vocabularyService: VocabularyServiceProxy,
-    public _quizService: QuizServiceProxy) {
+    public _quizService: QuizServiceProxy,
+    public route: ActivatedRoute) {
     super(injector);
 
   }
@@ -77,10 +83,20 @@ export class QuizComponent extends AppComponentBase implements OnInit {
     this.loadRandomList();
   }
 
-  loadRandomList(): void {
+  async loadRandomList() {
+    let params = await firstValueFrom(this.route.queryParams); // Wait for the first value from the Observable
+    let studySetId = params['stdsetid'];
+    let wordClassTerm = params['classification.term'];
+    let wordClassMethod = params['classification.method'];
+
+    let wordClassFilter = undefined;
+    
+    if (wordClassTerm !== undefined)
+      wordClassFilter = FilterProperty.toFilterProperty<WordClassEnum>(wordClassTerm, wordClassMethod);
+
     this._vocabularyService.getRandom(
-      undefined,
-      undefined,
+      studySetId,
+      wordClassFilter,
       undefined,
       this.NUMBER_OF_QUESTIONS)
       .subscribe((vocabularies) => {

@@ -2019,6 +2019,7 @@ export class VocabularyServiceProxy {
         term: string | undefined,
         classification: FilterProperty<WordClassEnum> | undefined,
         level: FilterProperty<VocabularyLevelEnum> | undefined,
+        dateRange: DateRangeTypeEnum | undefined,
         skipCount: number | undefined,
         maxResultCount: number | undefined): Observable<VocabularyDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Vocabulary/GetAll?";
@@ -2028,6 +2029,8 @@ export class VocabularyServiceProxy {
             url_ += "Classification.Term=" + encodeURIComponent("" + (classification.term !== undefined ? classification.term : "")) + "&" + "Classification.Method=" + encodeURIComponent('' + classification.method) + "&";
         if (level?.term !== undefined)
             url_ += "Level.Term=" + encodeURIComponent("" + (level.term !== undefined ? level.term : "")) + "&" + "Level.Method=" + encodeURIComponent('' + level.method) + "&";
+        if (dateRange !== undefined)
+            url_ += "DateRangeType=" + encodeURIComponent("" + dateRange) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -2881,6 +2884,102 @@ export class QuizServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = QuizDto.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    count(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Quiz/Count?";
+        
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCount(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCount(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(resultData200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getAccurateStatistic(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Quiz/GetAccurateStatistic?";
+        
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAccurateStatistic(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAccurateStatistic(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetAccurateStatistic(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            return _observableOf(resultData200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -5431,6 +5530,7 @@ export class StudySetDto implements IStudySetDto {
     description: string | undefined;
     wordTypeConfig: StudySetTypeConfigEnum | undefined;
     levelConfig: VocabularyLevelEnum | undefined;
+    dateRangeConfig: DateRangeTypeEnum | undefined;
     lastModificationTime: moment.Moment | undefined;
     vocabularies: SelectedVocabularyDto[] | undefined;
 
@@ -5450,6 +5550,7 @@ export class StudySetDto implements IStudySetDto {
             this.description = _data["description"];
             this.wordTypeConfig = _data["wordTypeConfig"];
             this.levelConfig = _data["levelConfig"];
+            this.dateRangeConfig = _data["dateRangeConfig"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             if (Array.isArray(_data["vocabularies"])) {
                 this.vocabularies = [] as any;
@@ -5473,6 +5574,7 @@ export class StudySetDto implements IStudySetDto {
         data["description"] = this.description;
         data["wordTypeConfig"] = this.wordTypeConfig;
         data["levelConfig"] = this.levelConfig;
+        data["dateRangeConfig"] = this.dateRangeConfig;
         data["lastModificationTime"] = this.lastModificationTime;
         if (Array.isArray(this.vocabularies)) {
             data["vocabularies"] = [];
@@ -5496,6 +5598,7 @@ export interface IStudySetDto {
     description: string | undefined;
     wordTypeConfig: StudySetTypeConfigEnum | undefined;
     levelConfig: VocabularyLevelEnum | undefined;
+    dateRangeConfig: DateRangeTypeEnum | undefined;
     lastModificationTime: moment.Moment | undefined;
     vocabularies: SelectedVocabularyDto[] | undefined;
 }
@@ -5560,6 +5663,7 @@ export class CreateStudySetDto implements ICreateStudySetDto {
     description: string | undefined;
     wordTypeConfig: StudySetTypeConfigEnum | undefined;
     levelConfig: VocabularyLevelEnum | undefined;
+    dateRangeConfig: DateRangeTypeEnum | undefined;
     vocabularyIds: number[] | undefined;
 
     constructor(data?: ICreateStudySetDto) {
@@ -5577,6 +5681,7 @@ export class CreateStudySetDto implements ICreateStudySetDto {
             this.description = _data["description"];
             this.wordTypeConfig = _data["wordTypeConfig"];
             this.levelConfig = _data["levelConfig"];
+            this.dateRangeConfig = _data["dateRangeConfig"];
             if (Array.isArray(_data["vocabularyIds"])) {
                 this.vocabularyIds = [] as any;
                 for (let item of _data["vocabularyIds"])
@@ -5598,6 +5703,7 @@ export class CreateStudySetDto implements ICreateStudySetDto {
         data["description"] = this.description;
         data["wordTypeConfig"] = this.wordTypeConfig;
         data["levelConfig"] = this.levelConfig;
+        data["dateRangeConfig"] = this.dateRangeConfig;
         if (Array.isArray(this.vocabularyIds)) {
             data["vocabularyIds"] = [];
             for (let item of this.vocabularyIds)
@@ -5619,6 +5725,7 @@ export interface ICreateStudySetDto {
     description: string | undefined;
     wordTypeConfig: StudySetTypeConfigEnum | undefined;
     levelConfig: VocabularyLevelEnum | undefined;
+    dateRangeConfig: DateRangeTypeEnum | undefined;
     vocabularyIds: number[] | undefined;
 }
 

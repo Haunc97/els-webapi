@@ -1,11 +1,9 @@
 import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { StudySetTypeConfig2LabelMapping } from '@shared/AppConsts';
-import { StudySetTypeConfigEnum } from '@shared/AppEnums';
+import { DateRangeType2LabelMapping, StudySetTypeConfig2LabelMapping } from '@shared/AppConsts';
+import { DateRangeTypeEnum, StudySetTypeConfigEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
 import { CreateStudySetDto, DropdownItemDto, SelectedVocabularyDto, StudySetServiceProxy, VocabularySelectionDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-create-studyset-dialog',
@@ -13,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./create-studyset-dialog.component.css']
 })
 export class CreateStudysetDialogComponent extends AppComponentBase
-implements OnInit {
+  implements OnInit {
   saving = false;
   stdSet = new CreateStudySetDto();
   vocabularies: DropdownItemDto<number>[] = [];
@@ -22,10 +20,16 @@ implements OnInit {
   isDataLoading = false;
 
   public StudySetTypeConfig2LabelMapping = StudySetTypeConfig2LabelMapping;
+  public DateRangeType2LabelMapping = DateRangeType2LabelMapping;
 
   typeConfigOptions =
     Object
       .values(StudySetTypeConfigEnum)
+      .filter(value => typeof value === 'number');
+
+  dateRangeConfigOptions =
+    Object
+      .values(DateRangeTypeEnum)
       .filter(value => typeof value === 'number');
 
   @Output() onSave = new EventEmitter<any>();
@@ -77,7 +81,7 @@ implements OnInit {
   ): void {
     let index = this.selectedVocabularies.indexOf(vocabulary);
     this.selectedVocabularies.splice(index, 1);
-    
+
     // mark item as unselect
     index = this.vocabularies?.findIndex(x => x.value === vocabulary.id) ?? -1;
     if (index !== -1)

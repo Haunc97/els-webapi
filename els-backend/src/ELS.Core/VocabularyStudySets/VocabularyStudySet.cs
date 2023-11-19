@@ -10,9 +10,7 @@ using Abp.Timing;
 namespace ELS.VocabularyStudySets
 {
     [Table("AppVocabularyStudySets")]
-    [PrimaryKey(
-        nameof(StudySetId),
-        nameof(VocabularyId))]
+    [PrimaryKey(nameof(StudySetId), nameof(VocabularyId))]
     public class VocabularyStudySet : Entity, IAudited, IMustHaveTenant
     {
         public int StudySetId { get; set; }

@@ -1,6 +1,6 @@
 import { Component, Injector } from '@angular/core';
 import { VocabularyLevel2LabelMapping, VocabularyLevelLabelClassMapping, WordClass2LabelMapping, WordClassLabelClassMapping } from '@shared/AppConsts';
-import { FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
+import { DateRangeTypeEnum, FilterMethodEnum, VocabularyLevelEnum, WordClassEnum } from '@shared/AppEnums';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { FilterProperty, VocabularyDtoPagedResultDto, VocabularyListDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
@@ -10,10 +10,12 @@ import { CreateVocabularyDialogComponent } from './create-vocabulary-dialog/crea
 import { EditVocabularyDialogComponent } from './edit-vocabulary-dialog/edit-vocabulary-dialog.component';
 import { ViewVocabularyDialogComponent } from './view-vocabulary-dialog/view-vocabulary-dialog.component';
 import { CreateBulkVocabularyDialogComponent } from './create-bulk-vocabulary-dialog/create-bulk-vocabulary-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 class PagedVocabulariesRequestDto extends PagedRequestDto {
   term: string;
   classification: FilterProperty<WordClassEnum> | null
   level: FilterProperty<VocabularyLevelEnum> | null
+  dateRangeType: DateRangeTypeEnum | null
 }
 @Component({
   selector: 'app-vocabularies',
@@ -25,6 +27,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
   term = '';
   classification = undefined;
   level = undefined;
+  dateRangeType = undefined;
   advancedFiltersVisible = false;
 
   public WordClass2LabelMapping = WordClass2LabelMapping;
@@ -46,10 +49,31 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
 
   constructor(
     injector: Injector,
+    private route: ActivatedRoute,
     private _vocabularyService: VocabularyServiceProxy,
     private _modalService: BsModalService
   ) {
     super(injector);
+  }
+
+  ngOnInit() {
+    // let params = await firstValueFrom(this.route.queryParams); // Wait for the first value from the Observable
+    // if (params['search']) {
+    //   this.keyword = params['search'];
+    // }
+    // super.ngOnInit();
+
+    this.route.queryParams.subscribe((_params) => {
+      if (_params['search']) {
+        this.term = _params['search'];
+      }
+
+      if (_params['creationdate']) {
+        this.dateRangeType = _params['creationdate'];
+      }
+
+      super.ngOnInit();
+    })
   }
 
   createVocabulary(): void {
@@ -83,6 +107,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
     finishedCallback: Function
   ): void {
     request.term = this.term;
+    request.dateRangeType = this.dateRangeType;
     request.level = FilterProperty.toFilterProperty<VocabularyLevelEnum>(this.level, FilterMethodEnum.Equal);
     if (this.classification !== undefined)
       request.classification = FilterProperty.toFilterProperty<WordClassEnum>(this.classification, FilterMethodEnum.Equal);
@@ -94,6 +119,7 @@ export class VocabulariesComponent extends PagedListingComponentBase<VocabularyL
         request.term,
         request.classification,
         request.level,
+        request.dateRangeType,
         request.skipCount,
         request.maxResultCount
       )

@@ -7,6 +7,8 @@ namespace ELS.Quizzes
     public interface IQuizAppService : IApplicationService
     {
         #region Queries
+        Task<int> CountAsync();
+        Task<decimal> GetAccurateStatisticAsync();
         #endregion
 
         #region Commands

@@ -9,9 +9,7 @@ using ELS.Quizzes;
 namespace ELS.VocabularyQuizzes
 {
     [Table("AppVocabularyQuizzes")]
-    [PrimaryKey(
-        nameof(QuizId),
-        nameof(VocabularyId))]
+    [PrimaryKey(nameof(QuizId), nameof(VocabularyId))]
     public class VocabularyQuiz : Entity, IHasCreationTime, IMustHaveTenant
     {
         public int QuizId { get; set; }

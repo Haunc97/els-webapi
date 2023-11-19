@@ -1,4 +1,5 @@
 ﻿using Abp.AutoMapper;
+using ELS.Models;
 using ELS.Vocabularies;
 
 namespace ELS.StudySets.Dtos
@@ -13,6 +14,8 @@ namespace ELS.StudySets.Dtos
         public StudySetTypeConfig? WordTypeConfig { get; set; }
 
         public VocabularyLevelType? LevelConfig { get; set; }
+
+        public DateRangeType? DateRangeConfig { get; set; }
 
         public int[] VocabularyIds { get; set; }
     }

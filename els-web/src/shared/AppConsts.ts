@@ -1,4 +1,4 @@
-import { StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from "./AppEnums";
+import { DateRangeTypeEnum, StudySetTypeConfigEnum, VocabularyLevelEnum, WordClassEnum } from "./AppEnums";
 
 export class AppConsts {
 
@@ -70,4 +70,11 @@ export const VocabularyLevelLabelClassMapping: Record<VocabularyLevelEnum, strin
 export const StudySetTypeConfig2LabelMapping: Record<StudySetTypeConfigEnum, string> = {
     [StudySetTypeConfigEnum.ExcludeSentence]: "Exclude Sentence",
     [StudySetTypeConfigEnum.SentenceOnly]: "Sentence Only"
+};
+
+export const DateRangeType2LabelMapping: Record<DateRangeTypeEnum, string> = {
+    [DateRangeTypeEnum.ThisWeek]: "This week",
+    [DateRangeTypeEnum.LastWeek]: "Last week",
+    [DateRangeTypeEnum.ThisMonth]: "This month",
+    [DateRangeTypeEnum.LastMonth]: "Last month"
 };

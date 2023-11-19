@@ -48,8 +48,14 @@ namespace ELS.Vocabularies
             CreationTime = Clock.Now;
         }
 
-        public Vocabulary(string term, string definition, WordClassType classification, VocabularyLevelType level, string phonetics = null, string description = null, string example = null)
-            : this()
+        public Vocabulary(
+            string term,
+            string definition,
+            WordClassType classification,
+            VocabularyLevelType level,
+            string phonetics = null,
+            string description = null,
+            string example = null) : this()
         {
             Term = term;
             Definition = definition;
@@ -74,22 +80,17 @@ namespace ELS.Vocabularies
 
         public void UpdateStudySets(IList<StudySet> studySets)
         {
-            //Remove from removed vocabularies
-            foreach (var vocabularyStudySet in this.VocabularyStudySets)
+            // Remove items
+            foreach (var vocStdS in this.VocabularyStudySets)
             {
-                if (studySets.All(studySet => vocabularyStudySet.StudySetId != studySet.Id))
-                {
-                    this.VocabularyStudySets.Remove(vocabularyStudySet);
-                }
+                if (studySets.All(x => x.Id != vocStdS.StudySetId)) this.VocabularyStudySets.Remove(vocStdS);
+                
             }
 
-            //Add to added vocabularies
-            foreach (var studySet in studySets)
+            // Add items
+            foreach (var stdS in studySets)
             {
-                if (VocabularyStudySets.All(vocabularyStudySets => studySet.Id != vocabularyStudySets.StudySetId))
-                {
-                    this.AddStudySet(studySet);
-                }
+                if (VocabularyStudySets.All(x => x.StudySetId != stdS.Id)) this.AddStudySet(stdS);
             }
         }
     }

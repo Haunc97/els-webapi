@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
+using ELS.Models;
 using ELS.Vocabularies;
 using ELS.Vocabularies.Dtos;
 using System;
@@ -18,6 +19,8 @@ namespace ELS.StudySets.Dtos
         public StudySetTypeConfig? WordTypeConfig { get; set; }
 
         public VocabularyLevelType? LevelConfig { get; set; }
+
+        public DateRangeType? DateRangeConfig { get; set; }
 
         public DateTime? LastModificationTime { get; set; }
 

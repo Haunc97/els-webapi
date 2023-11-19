@@ -13,11 +13,7 @@ namespace ELS.StudySets
         #endregion
 
         #region Commands
-        #endregion
-    }
 
-    public class GetStudySetSelectionRequestDto : LimitedResultRequestDto
-    {
-        public string Keyword { get; set; }
+        #endregion
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using ELS.VocabularyStudySets;
 using Abp.Timing;
 using System.Linq;
+using ELS.Models;
 
 namespace ELS.StudySets
 {
@@ -25,6 +26,8 @@ namespace ELS.StudySets
         public StudySetTypeConfig? WordTypeConfig { get; set; }
 
         public VocabularyLevelType? LevelConfig { get; set; }
+
+        public DateRangeType? DateRangeConfig { get; set; }
 
         public int TenantId { get; set; }
 
@@ -57,24 +60,19 @@ namespace ELS.StudySets
             this.VocabularyStudySets.Add(vocabularyStudySet);
         }
 
-        public void UpdateVocabularies(Vocabulary[] vocabularies)
+        public void UpdateVocabularies(IList<Vocabulary> vocabularies)
         {
-            //Remove from removed vocabularies
-            foreach (var vocabularyStudySet in this.VocabularyStudySets)
+            //Remove items
+            foreach (var vocStdS in this.VocabularyStudySets)
             {
-                if (vocabularies.All(vocabulary => vocabularyStudySet.VocabularyId != vocabulary.Id))
-                {
-                    this.VocabularyStudySets.Remove(vocabularyStudySet);
-                }
+                if (vocabularies.All(x => x.Id != vocStdS.VocabularyId)) this.VocabularyStudySets.Remove(vocStdS);
             }
 
-            //Add to added vocabularies
-            foreach (var vocabulary in vocabularies)
+            //Add items
+            foreach (var voc in vocabularies)
             {
-                if (VocabularyStudySets.All(vocabularyStudySets => vocabulary.Id != vocabularyStudySets.VocabularyId))
-                {
-                    this.AddVocabulary(vocabulary);
-                }
+                if (VocabularyStudySets.All(x => x.VocabularyId != voc.Id)) this.AddVocabulary(voc);
+                
             }
         }
     }

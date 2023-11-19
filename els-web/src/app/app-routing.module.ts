@@ -20,16 +20,16 @@ import { QuizComponent } from './activities/quiz/quiz.component';
                 path: '',
                 component: AppComponent,
                 children: [
-                    { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
-                    { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'roles', component: RolesComponent, data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },
-                    { path: 'tenants', component: TenantsComponent, data: { permission: 'Pages.Tenants' }, canActivate: [AppRouteGuard] },
-                    { path: 'update-password', component: ChangePasswordComponent, canActivate: [AppRouteGuard] },
-                    { path: 'vocabularies', component: VocabulariesComponent, canActivate: [AppRouteGuard] },
-                    { path: 'sentences', component: SentencesComponent, canActivate: [AppRouteGuard] },
-                    { path: 'studysets', component: StudysetsComponent, canActivate: [AppRouteGuard] },
-                    { path: 'flashcards', component: FlashcardsComponent, canActivate: [AppRouteGuard] },
-                    { path: 'quiz', component: QuizComponent, canActivate: [AppRouteGuard] }
+                    { path: 'home', component: HomeComponent, title: 'Home',  canActivate: [AppRouteGuard] },
+                    { path: 'users', component: UsersComponent, title: 'Users', data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
+                    { path: 'roles', component: RolesComponent, title: 'Roles', data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },
+                    { path: 'tenants', component: TenantsComponent, title: 'Tenants', data: { permission: 'Pages.Tenants' }, canActivate: [AppRouteGuard] },
+                    { path: 'update-password', component: ChangePasswordComponent, title: 'Update Password', canActivate: [AppRouteGuard] },
+                    { path: 'vocabularies', component: VocabulariesComponent, title: 'Vocabularies', canActivate: [AppRouteGuard] },
+                    { path: 'sentences', component: SentencesComponent, title: 'Sentences', canActivate: [AppRouteGuard] },
+                    { path: 'studysets', component: StudysetsComponent, title: 'Study Sets', canActivate: [AppRouteGuard] },
+                    { path: 'flashcards', component: FlashcardsComponent, title: 'Flashcards', canActivate: [AppRouteGuard] },
+                    { path: 'quiz', component: QuizComponent, title: 'Quiz', canActivate: [AppRouteGuard] }
                 ]
             }
         ])

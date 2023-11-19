@@ -10,7 +10,7 @@
     </section>
     <section class="content px-2">
         <div class="container-fluid">
-            <div class="card">
+            <div class="card" style="background-color: #f8f9fa;">
                 <form 
                     class="form-horizontal"
                     autocomplete="off"
@@ -48,7 +48,12 @@
                                     </ng-container>
                                 </div>
                                 <div *ngIf="!question.isCorrect && question.isSubmitted" class="text-secondary">
-                                    <strong>{{"Answer" | localize}}: </strong> {{question.answer}}
+                                    <strong>{{"Answer" | localize}}: </strong>
+                                    <a 
+                                        [routerLink]="[question.isSentence ? '../sentences' : '../vocabularies']"
+                                        [queryParams]="{'search': question.answer}"
+                                        target="_blank">{{question.answer}}
+                                    </a>
                                 </div>
                             </div>
                         </div>

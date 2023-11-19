@@ -43,6 +43,6 @@ export enum FilterMethodEnum {
 export enum DateRangeTypeEnum {
     ThisWeek = 1,
     LastWeek = 2,
-    ThisMonth = 1,
-    LastMonth = 2
+    ThisMonth = 3,
+    LastMonth = 4
 }

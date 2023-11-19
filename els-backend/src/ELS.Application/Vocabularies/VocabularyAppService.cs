@@ -23,6 +23,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ELS.Common;
 using ELS.Common.Dto;
+using ELS.Common.Extensions;
+using ELS.Models;
 
 namespace ELS.Vocabularies
 {
@@ -75,9 +77,11 @@ namespace ELS.Vocabularies
         public async Task<ListResultDto<VocabularyDto>> CreateBulkAsync(List<CreateVocabularyDto> input)
         {
             var entities = new List<Vocabulary>();
+
             foreach (var entityDto in input)
             {
                 var entity = ObjectMapper.Map<Vocabulary>(entityDto);
+
                 if (entityDto.StudySetIds != null)
                 {
                     var studySets = await _studySetRepository.GetAllIncluding(s => s.VocabularyStudySets)
@@ -89,8 +93,10 @@ namespace ELS.Vocabularies
                         entity.AddStudySet(studySet);
                     }
                 }
+
                 entities.Add(entity);
             }
+
             await _vocabularyRepository.InsertRangeAsync(entities);
 
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -130,11 +136,15 @@ namespace ELS.Vocabularies
         #region Queries
         public async Task<PagedResultDto<VocabularyListDto>> GetAllAsync(PagedVocabularyResultRequestDto input)
         {
+            var dateRange = input.DateRangeType.GetDateRange();
+
             var query = _vocabularyRepository
                 .GetAll()
                 .WhereIf(!string.IsNullOrEmpty(input.Term), v => v.Term.ToLower().IndexOf(input.Term.ToLower()) >= 0)
                 .WhereIf(input.Classification != null, GetFilter(input.Classification, nameof(Vocabulary.Classification)))
                 .WhereIf(input.Level != null, GetFilter(input.Level, nameof(Vocabulary.Level)))
+                .WhereIf(dateRange.Item1.HasValue, v => v.CreationTime.Date >= dateRange.Item1.Value)
+                .WhereIf(dateRange.Item2.HasValue, v => v.CreationTime.Date <= dateRange.Item2.Value)
                 .OrderByDescending(v => v.CreationTime);
 
             var totalCount = await query.CountAsync();
@@ -277,7 +287,7 @@ namespace ELS.Vocabularies
 			                        AND [IsCorrect] = 0
                         ) t2
 
-                        WHERE t1.[Count] > 0
+                        WHERE vo.IsDeleted = 0 AND t1.[Count] > 0
                         ORDER BY [Percentage] DESC, t1.[Count] DESC 
             ";
 
@@ -321,7 +331,7 @@ namespace ELS.Vocabularies
         [HttpGet]
         public async Task<int> CountVocabulariesAsync(DateRangeType? rangeType, FilterProperty<WordClassType>? classification)
         {
-            var dateRange = GetDateRange(rangeType);
+            var dateRange = rangeType.GetDateRange();
 
             var result = await _vocabularyRepository
                 .GetAll()
@@ -333,28 +343,6 @@ namespace ELS.Vocabularies
             return result;
         }
         #endregion
-
-        private Tuple<DateTime?, DateTime?> GetDateRange(DateRangeType? rangeType)
-        {
-            DateTime? dateFrom = null;
-            DateTime? dateTo = null;
-            switch (rangeType)
-            {
-                case DateRangeType.ThisWeek:
-                    dateFrom = DateTime.Now.StartOfWeek(DayOfWeek.Monday);
-                    dateTo = dateFrom.Value.AddDays(6);
-                    break;
-                case DateRangeType.LastWeek:
-                    break;
-                case DateRangeType.ThisMonth:
-                    break;
-                case DateRangeType.LastMonth:
-                    break;
-                default:
-                    break;
-            }
-            return new Tuple<DateTime?, DateTime?> (dateFrom, dateTo);
-        }
 
         private Expression<Func<Vocabulary, bool>> GetFilter<T>(
             FilterProperty<T> filter,

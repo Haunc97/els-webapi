@@ -8,6 +8,7 @@ using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using ELS.Common.Dto;
+using ELS.Common.Extensions;
 using ELS.StudySets.Dtos;
 using ELS.Vocabularies;
 using ELS.Vocabularies.Dtos;
@@ -24,8 +25,7 @@ namespace ELS.StudySets
         public StudySetAppService(
             IRepository<StudySet, int> repository,
             IRepository<Vocabulary> vocabularyRepository,
-            IRepository<VocabularyStudySet> vocabularyStudySetRepository)
-            : base(repository)
+            IRepository<VocabularyStudySet> vocabularyStudySetRepository) : base(repository)
         {
             _vocabularyRepository = vocabularyRepository;
             _vocabularyStudySetRepository = vocabularyStudySetRepository;
@@ -38,14 +38,25 @@ namespace ELS.StudySets
 
             var stdSet = ObjectMapper.Map<StudySet>(input);
 
-            if (input.VocabularyIds != null)
-            {
-                var vocabularies = await _vocabularyRepository.GetAllListAsync(x => input.VocabularyIds.Contains(x.Id));
+            var vocabularies = new List<Vocabulary>();
 
-                foreach (var vocabulary in vocabularies)
-                {
-                    stdSet.AddVocabulary(vocabulary);
-                }
+            if (input.DateRangeConfig.HasValue)
+            {
+                var dateRange = input.DateRangeConfig.GetDateRange();
+
+                vocabularies = await _vocabularyRepository.GetAll()
+                    .WhereIf(dateRange.Item1.HasValue, v => v.CreationTime.Date >= dateRange.Item1.Value)
+                    .WhereIf(dateRange.Item2.HasValue, v => v.CreationTime.Date <= dateRange.Item2.Value)
+                    .ToListAsync();
+            }
+            else if (input.VocabularyIds != null)
+            {
+                vocabularies = await _vocabularyRepository.GetAllListAsync(x => input.VocabularyIds.Contains(x.Id));
+            }
+
+            foreach (var vocabulary in vocabularies)
+            {
+                stdSet.AddVocabulary(vocabulary);
             }
 
             await Repository.InsertAsync(stdSet);
@@ -67,7 +78,7 @@ namespace ELS.StudySets
             var vocabularyIds = input.Vocabularies.Select(x => x.Id);
             var vocabularies = await _vocabularyRepository.GetAllListAsync(x => vocabularyIds.Contains(x.Id));
 
-            stdSet.UpdateVocabularies(vocabularies.ToArray());
+            stdSet.UpdateVocabularies(vocabularies);
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
@@ -89,12 +100,6 @@ namespace ELS.StudySets
             return new ListResultDto<DropdownItemDto<int>>(dropdownItems);
         }
         #endregion
-
-        protected override IQueryable<StudySet> CreateFilteredQuery(PagedStudySetResultRequestDto input)
-        {
-            return Repository.GetAllIncluding(s => s.VocabularyStudySets)
-                .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), x => x.Title.Contains(input.Keyword));
-        }
 
         protected override StudySetDto MapToEntityDto(StudySet stdSet)
         {

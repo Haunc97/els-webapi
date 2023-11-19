@@ -86,7 +86,7 @@
                             <tr>
                                 <th>{{ "Title" | localize }}</th>
                                 <th>{{ "VocabularyQty" | localize }}</th>
-                                <th style="width: 250px;">{{ "Actions" | localize }}</th>
+                                <th style="width: 300px;">{{ "Actions" | localize }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -107,7 +107,7 @@
                                 <td>
                                     <button
                                             type="button"
-                                            class="btn btn-sm bg-success"
+                                            class="btn btn-xs bg-success"
                                             [routerLink]="['/app/flashcards']" [queryParams]="{'stdsetid': stdSet.id}" routerLinkActive="router-link-active"
                                             
                                     >
@@ -116,7 +116,16 @@
                                     </button>
                                     <button
                                             type="button"
-                                            class="btn btn-sm bg-secondary mx-2"
+                                            class="btn btn-xs bg-blue mx-2"
+                                            [routerLink]="['/app/quiz']" [queryParams]="{'stdsetid': stdSet.id}" routerLinkActive="router-link-active"
+                                            
+                                    >
+                                        <i class="fa fa-question-circle"></i>
+                                        {{ "Quiz" | localize }}
+                                    </button>
+                                    <button
+                                            type="button"
+                                            class="btn btn-xs bg-secondary"
                                             (click)="editStdSet(stdSet)"
                                     >
                                         <i class="fas fa-pencil-alt"></i>
@@ -124,7 +133,7 @@
                                     </button>
                                     <button
                                             type="button"
-                                            class="btn btn-sm bg-danger"
+                                            class="btn btn-xs bg-danger mx-2"
                                             (click)="delete(stdSet)"
                                     >
                                         <i class="fas fa-trash"></i>

@@ -71,10 +71,27 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="dateCfg">
+                        {{ "DateRangeConfig" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                        <select
+                            class="form-control show-tick"
+                            name="dateCfg"
+                            [(ngModel)]="stdSet.dateRangeConfig">
+                            <option value="undefined">-- Please select --</option>
+                            <option *ngFor="let dateRangeConfigOption of dateRangeConfigOptions"
+                                    [value]="dateRangeConfigOption">
+                                {{DateRangeType2LabelMapping[dateRangeConfigOption]}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </tab>
             <tab [heading]="'Vocabularies' | localize" class="pt-3 px-2">
                 <div class="form-group row mb-0">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md" *ngIf="!stdSet.dateRangeConfig">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span 
@@ -115,10 +132,10 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-md-6 w-100"
+                    <div class="col-md w-100"
                         style="height: 253px;
                                 overflow-y: auto;">
-                        <div><strong>{{'SelectedItems' | localize}}</strong></div>
+                        <div><strong>Selected {{stdSet.vocabularies?.length ?? 0}} Item(s)</strong></div>
                         <ul class="list-group list-group-flush">
                             <li 
                                 *ngFor="let vocabulary of stdSet.vocabularies; let i = index"

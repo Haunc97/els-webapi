@@ -71,6 +71,23 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="dateCfg">
+                        {{ "DateRangeConfig" | localize }}
+                    </label>
+                    <div class="col-md-9">
+                        <select
+                            class="form-control show-tick"
+                            name="dateCfg"
+                            [(ngModel)]="stdSet.dateRangeConfig">
+                            <option value="undefined">-- Please select --</option>
+                            <option *ngFor="let dateRangeConfigOption of dateRangeConfigOptions"
+                                    [value]="dateRangeConfigOption">
+                                {{DateRangeType2LabelMapping[dateRangeConfigOption]}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </tab>
             <tab [heading]="'Vocabularies' | localize" class="pt-3 px-2">
                 <div class="form-group row mb-0">

@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using ELS.Common;
+using ELS.Models;
 
 namespace ELS.Vocabularies.Dtos
 {
@@ -10,5 +11,7 @@ namespace ELS.Vocabularies.Dtos
         public FilterProperty<WordClassType> Classification { get; set; }
 
         public FilterProperty<VocabularyLevelType> Level { get; set; }
+
+        public DateRangeType? DateRangeType { get; set; }
     }
 }

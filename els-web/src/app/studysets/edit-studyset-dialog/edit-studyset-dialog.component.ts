@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
-import { StudySetTypeConfig2LabelMapping } from '@shared/AppConsts';
-import { StudySetTypeConfigEnum } from '@shared/AppEnums';
+import { DateRangeType2LabelMapping, StudySetTypeConfig2LabelMapping } from '@shared/AppConsts';
+import { DateRangeTypeEnum, StudySetTypeConfigEnum } from '@shared/AppEnums';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DropdownItemDto, SelectedVocabularyDto, StudySetDto, StudySetServiceProxy, VocabularySelectionDto, VocabularyServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -20,10 +20,16 @@ export class EditStudysetDialogComponent extends AppComponentBase
   vocabularies: DropdownItemDto<number>[] = [];
 
   public StudySetTypeConfig2LabelMapping = StudySetTypeConfig2LabelMapping;
+  public DateRangeType2LabelMapping = DateRangeType2LabelMapping;
 
   typeConfigOptions =
     Object
       .values(StudySetTypeConfigEnum)
+      .filter(value => typeof value === 'number');
+
+  dateRangeConfigOptions =
+    Object
+      .values(DateRangeTypeEnum)
       .filter(value => typeof value === 'number');
 
   @Output() onSave = new EventEmitter<any>();
@@ -75,9 +81,12 @@ export class EditStudysetDialogComponent extends AppComponentBase
   unselectVocabulary(
     vocabulary: SelectedVocabularyDto
   ): void {
+    
+    if (this.stdSet.dateRangeConfig) return;
+
     let index = this.stdSet.vocabularies.indexOf(vocabulary);
     this.stdSet.vocabularies.splice(index, 1);
-    
+
     // mark item as unselect
     index = this.vocabularies?.findIndex(x => x.value === vocabulary.id) ?? -1;
     if (index !== -1)

@@ -2,8 +2,8 @@
 using Abp.Application.Services.Dto;
 using ELS.Common;
 using ELS.Common.Dto;
+using ELS.Models;
 using ELS.Vocabularies.Dtos;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -34,18 +34,5 @@ namespace ELS.Vocabularies
 
         Task<VocabularyDto> UpdateAsync(VocabularyDto input);
         #endregion
-    }
-
-    public class GetVocabularySelectionRequestDto : LimitedResultRequestDto
-    {
-        public string Keyword { get; set; }
-    }
-
-    public enum DateRangeType
-    {
-        ThisWeek = 1,
-        LastWeek = 2,
-        ThisMonth = 3,
-        LastMonth = 4
     }
 }

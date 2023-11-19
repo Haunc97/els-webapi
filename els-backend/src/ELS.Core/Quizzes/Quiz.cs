@@ -32,18 +32,22 @@ namespace ELS.Quizzes
 
         public void AddVocabularyQuiz(int vocabularyId, string anwser, bool isCorrect)
         {
-            if (VocabularyQuizzes == null && Id > 0) throw new ArgumentNullException(nameof(VocabularyQuizzes));
+            if (this.Id > 0 && this.VocabularyQuizzes == null)
+            {
+                throw new ArgumentNullException(nameof(VocabularyQuizzes));
+            }
             
             if (VocabularyQuizzes == null) VocabularyQuizzes = new List<VocabularyQuiz>();
 
-            var entity = new VocabularyQuiz
+
+            var newVocabularyQuiz = new VocabularyQuiz
             {
                 VocabularyId = vocabularyId,
                 Answer = anwser,
                 IsCorrect = isCorrect
             };
 
-            VocabularyQuizzes.Add(entity);
+            VocabularyQuizzes.Add(newVocabularyQuiz);
         }
     }
 }
